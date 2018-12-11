@@ -2,13 +2,13 @@ package main
 
 import (
 	"bytes"
-	"log"
-	"net/http"
-	"os"
-
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"log"
+	"net/http"
+	"os"
 )
 
 const (
@@ -24,10 +24,13 @@ func main() {
 	}
 
 	// Upload File
-	err = AddFileToS3(s, "main.go")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = AddFileToS3(s, "main.go")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// List Files
+	err = ListFiles(s)
 }
 
 func AddFileToS3(s *session.Session, fileDir string) error {
@@ -52,5 +55,21 @@ func AddFileToS3(s *session.Session, fileDir string) error {
 		ContentDisposition:   aws.String("attachment"),
 		ServerSideEncryption: aws.String("AES256"),
 	})
+	return err
+}
+
+func ListFiles(s *session.Session) error {
+	svc := s3.New(s)
+	response, err := svc.ListObjects(&s3.ListObjectsInput{
+		Bucket: aws.String(S3_BUCKET),
+	})
+	if err != nil {
+		return err
+	}
+	for _, item := range response.Contents {
+		if *item.Key == "main.go" {
+			fmt.Println("Last Modified: ", *item.LastModified)
+		}
+	}
 	return err
 }
