@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"time"
 )
 
 const (
@@ -17,17 +18,26 @@ const (
 	BIN_NAME  = "line-detection"
 )
 
+var hasPerfomred bool
+var localDate time.Time
+
 func main() {
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
 	if err != nil {
 		log.Fatal(err)
 	}
+	binaryPath := os.Getenv("GOPATH") + "/bin/"
+	p := exec.Command(binaryPath + BIN_NAME)
 
 	// Get Lastest on Startup
-	getBinary(s)
+
+	for {
+		CheckIfCurrent(s, p)
+		time.Sleep(5e+9)
+	}
 }
 
-func getBinary(s *session.Session) {
+func GetBinary(s *session.Session, p *exec.Cmd) {
 	binaryPath := os.Getenv("GOPATH") + "/bin/"
 	file, err := os.Create(binaryPath + BIN_NAME)
 	if err != nil {
@@ -46,28 +56,51 @@ func getBinary(s *session.Session) {
 	// Update Perms so we can Execute The File
 	perms := exec.Command("chmod", "+x", binaryPath+BIN_NAME)
 	perms.Start()
+
+	// Restart the Process
+	StartProcess(p)
 }
 
-func StartProcess() {
-
+func EndProcess(p *exec.Cmd) {
+	if !p.ProcessState.Exited() {
+		fmt.Println("Killing Process")
+		p.Process.Kill()
+	}
 }
 
-// func CheckIfCurrent(s *session.Session) error {
-// 	// TODO
-// }
+func StartProcess(p *exec.Cmd) {
+	if err := p.Start(); err != nil {
+		log.Fatal(err)
+	}
+}
 
-func ListFiles(s *session.Session) error {
+func CheckIfCurrent(s *session.Session, p *exec.Cmd) {
+	if hasPerfomred == false {
+		localDate = time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+		hasPerfomred = true
+	}
+	serverDate := GetDate(s)
+	if serverDate.After(localDate) {
+		fmt.Println("New Version Available")
+		localDate = serverDate
+		EndProcess(p)
+		GetBinary(s, p)
+	}
+}
+
+func GetDate(s *session.Session) time.Time {
 	svc := s3.New(s)
 	response, err := svc.ListObjects(&s3.ListObjectsInput{
 		Bucket: aws.String(S3_BUCKET),
 	})
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	for _, item := range response.Contents {
-		if *item.Key == "main.go" {
-			fmt.Println("Last Modified: ", *item.LastModified)
+		if *item.Key == BIN_NAME {
+			return *item.LastModified
 		}
 	}
-	return err
+	log.Fatal("File not Found")
+	return time.Now()
 }
