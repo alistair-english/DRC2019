@@ -20,6 +20,7 @@ const (
 
 var hasPerfomred bool
 var localDate time.Time
+var processIsRunning bool
 
 func main() {
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
@@ -62,15 +63,19 @@ func GetBinary(s *session.Session, p *exec.Cmd) {
 }
 
 func EndProcess(p *exec.Cmd) {
-	if !p.ProcessState.Exited() {
+	if processIsRunning {
 		fmt.Println("Killing Process")
 		p.Process.Kill()
+		processIsRunning = false
 	}
 }
 
 func StartProcess(p *exec.Cmd) {
-	if err := p.Start(); err != nil {
-		log.Fatal(err)
+	if !processIsRunning {
+		if err := p.Start(); err != nil {
+			log.Fatal(err)
+		}
+		processIsRunning = true
 	}
 }
 
