@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -18,27 +18,71 @@ const (
 	BIN_NAME  = "line-detection"
 )
 
-var hasPerfomred bool
-var localDate time.Time
-var processIsRunning bool
+var started bool
+var process bool
+var localFileDate time.Time
+var currentFileDate time.Time
+var p *exec.Cmd
 
 func main() {
-	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
+	s, err := session.NewSession(&aws.Config{
+		Region: aws.String(S3_REGION),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	binaryPath := os.Getenv("GOPATH") + "/bin/"
-	p := exec.Command(binaryPath + BIN_NAME)
-
-	// Get Lastest on Startup
 
 	for {
-		CheckIfCurrent(s, p)
+		// Check if New Version is Available
+		if !isCurrent(s) {
+			if !process {
+				pullBinary(s)
+				p = exec.Command(binaryPath + BIN_NAME)
+				if err := p.Start(); err != nil {
+					log.Fatal(err)
+				}
+				process = true
+			} else {
+				p.Process.Kill()
+				pullBinary(s)
+				p = exec.Command(binaryPath + BIN_NAME)
+				if err := p.Start(); err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
 		time.Sleep(5e+9)
 	}
 }
 
-func GetBinary(s *session.Session, p *exec.Cmd) {
+func isCurrent(s *session.Session) bool {
+	// Check if this is the first occurance
+	if !started {
+		localFileDate = time.Date(2009, time.January, 1, 1, 0, 0, 0, time.UTC)
+		started = true
+	}
+	svc := s3.New(s)
+	response, err := svc.ListObjects(&s3.ListObjectsInput{
+		Bucket: aws.String(S3_BUCKET),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, item := range response.Contents {
+		if *item.Key == BIN_NAME {
+			currentFileDate = *item.LastModified
+		}
+	}
+	if currentFileDate.After(localFileDate) {
+		localFileDate = currentFileDate
+		return false
+	} else {
+		return true
+	}
+}
+
+func pullBinary(s *session.Session) {
 	binaryPath := os.Getenv("GOPATH") + "/bin/"
 	file, err := os.Create(binaryPath + BIN_NAME)
 	if err != nil {
@@ -57,55 +101,4 @@ func GetBinary(s *session.Session, p *exec.Cmd) {
 	// Update Perms so we can Execute The File
 	perms := exec.Command("chmod", "+x", binaryPath+BIN_NAME)
 	perms.Start()
-
-	// Restart the Process
-	StartProcess(p)
-}
-
-func EndProcess(p *exec.Cmd) {
-	if processIsRunning {
-		fmt.Println("Killing Process")
-		p.Process.Kill()
-		processIsRunning = false
-	}
-}
-
-func StartProcess(p *exec.Cmd) {
-	if !processIsRunning {
-		if err := p.Start(); err != nil {
-			log.Fatal(err)
-		}
-		processIsRunning = true
-	}
-}
-
-func CheckIfCurrent(s *session.Session, p *exec.Cmd) {
-	if hasPerfomred == false {
-		localDate = time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-		hasPerfomred = true
-	}
-	serverDate := GetDate(s)
-	if serverDate.After(localDate) {
-		fmt.Println("New Version Available")
-		localDate = serverDate
-		EndProcess(p)
-		GetBinary(s, p)
-	}
-}
-
-func GetDate(s *session.Session) time.Time {
-	svc := s3.New(s)
-	response, err := svc.ListObjects(&s3.ListObjectsInput{
-		Bucket: aws.String(S3_BUCKET),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, item := range response.Contents {
-		if *item.Key == BIN_NAME {
-			return *item.LastModified
-		}
-	}
-	log.Fatal("File not Found")
-	return time.Now()
 }
