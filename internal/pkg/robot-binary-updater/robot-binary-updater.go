@@ -2,6 +2,7 @@ package main
 
 import (
 	// "fmt"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -76,6 +77,7 @@ func isCurrent(s *session.Session) bool {
 	}
 	if currentFileDate.After(localFileDate) {
 		localFileDate = currentFileDate
+		fmt.Println("New Version Available")
 		return false
 	} else {
 		return true
