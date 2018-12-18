@@ -1,19 +1,103 @@
 package main
 
 import (
+	"image"
+	"image/color"
+
 	"gocv.io/x/gocv"
 )
 
 func main() {
 
-	webcam, _ := gocv.VideoCaptureDevice(0)
-	window := gocv.NewWindow("Hello")
-	img := gocv.NewMat()
+	// THIS PROGRAM THRESHOLDS FOR BLUE HSV AND DRAWS BIG OBJECTS ON THE SCREEN (area > 1000)
 
-	for { // foreva
-		webcam.Read(&img)
-		window.IMShow(img)
-		window.WaitKey(1)
+	webcam, _ := gocv.VideoCaptureDevice(0)
+	defer webcam.Close()
+
+	// display windows
+	sourceWindow := gocv.NewWindow("Source")
+	defer sourceWindow.Close()
+
+	maskWindow := gocv.NewWindow("Mask")
+	defer maskWindow.Close()
+
+	// image matricies
+	sourceImg := gocv.NewMat()
+	defer sourceImg.Close()
+
+	blurredImg := gocv.NewMat()
+	defer blurredImg.Close()
+
+	hsvImg := gocv.NewMat()
+	defer hsvImg.Close()
+
+	mask := gocv.NewMat()
+	defer mask.Close()
+
+	finalMask := gocv.NewMat()
+	defer finalMask.Close()
+
+	webcam.Read(&sourceImg)
+
+	gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
+
+	channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
+
+	// define HSV color upper and lower bound ranges
+	lower := gocv.NewMatFromScalar(gocv.NewScalar(90.0, 100.0, 150.0, 0.0), gocv.MatTypeCV8UC3)
+	upper := gocv.NewMatFromScalar(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), gocv.MatTypeCV8UC3)
+
+	// split HSV lower bounds into H, S, V channels
+	lowerChans := gocv.Split(lower)
+	lowerMask := gocv.NewMatWithSize(rows, cols, gocv.MatTypeCV8UC3)
+	lowerMaskChans := gocv.Split(lowerMask)
+
+	// split HSV lower bounds into H, S, V channels
+	upperChans := gocv.Split(upper)
+	upperMask := gocv.NewMatWithSize(rows, cols, gocv.MatTypeCV8UC3)
+	upperMaskChans := gocv.Split(upperMask)
+
+	// copy HSV values to upper and lower masks
+	for c := 0; c < channels; c++ {
+		for i := 0; i < rows; i++ {
+			for j := 0; j < cols; j++ {
+				lowerMaskChans[c].SetUCharAt(i, j, lowerChans[c].GetUCharAt(0, 0))
+				upperMaskChans[c].SetUCharAt(i, j, upperChans[c].GetUCharAt(0, 0))
+			}
+		}
+	}
+
+	gocv.Merge(lowerMaskChans, &lowerMask)
+	gocv.Merge(upperMaskChans, &upperMask)
+
+	for { // for3vA
+
+		webcam.Read(&sourceImg)
+
+		gocv.GaussianBlur(sourceImg, &blurredImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
+
+		gocv.CvtColor(blurredImg, &hsvImg, gocv.ColorBGRToHSV)
+		gocv.InRange(hsvImg, lowerMask, upperMask, &mask)
+
+		gocv.Merge([]gocv.Mat{mask, mask, mask}, &finalMask)
+
+		// gocv.BitwiseAnd(hsvImg, finalMask, &hsvImg)
+
+		// gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorHSVToBGR)
+
+		contours := gocv.FindContours(mask, gocv.RetrievalTree, gocv.ChainApproxNone)
+
+		for i, contour := range contours {
+			if gocv.ContourArea(contour) > 1000 {
+				gocv.DrawContours(&sourceImg, contours, i, color.RGBA{255, 0, 0, 0}, 3)
+			}
+		}
+
+		maskWindow.IMShow(mask)
+
+		sourceWindow.IMShow(sourceImg)
+
+		sourceWindow.WaitKey(1)
 	}
 
 	// - get hsv image
