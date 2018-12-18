@@ -13,7 +13,7 @@ import (
 const (
 	S3_REGION = "ap-southeast-2"
 	S3_BUCKET = "drc2019"
-	BIN_NAME  = "line-detection"
+	BIN_NAME  = "test"
 )
 
 func main() {
