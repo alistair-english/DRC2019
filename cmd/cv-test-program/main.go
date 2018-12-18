@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image"
 	"image/color"
 
 	"gocv.io/x/gocv"
@@ -33,6 +32,9 @@ func main() {
 
 	mask := gocv.NewMat()
 	defer mask.Close()
+
+	blurMask := gocv.NewMat()
+	defer blurMask.Close()
 
 	finalMask := gocv.NewMat()
 	defer finalMask.Close()
@@ -74,10 +76,12 @@ func main() {
 
 		webcam.Read(&sourceImg)
 
-		gocv.GaussianBlur(sourceImg, &blurredImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
+		// gocv.GaussianBlur(sourceImg, &blurredImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
-		gocv.CvtColor(blurredImg, &hsvImg, gocv.ColorBGRToHSV)
+		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 		gocv.InRange(hsvImg, lowerMask, upperMask, &mask)
+
+		// gocv.GaussianBlur(mask, &blurMask, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
 		gocv.Merge([]gocv.Mat{mask, mask, mask}, &finalMask)
 
@@ -87,9 +91,11 @@ func main() {
 
 		contours := gocv.FindContours(mask, gocv.RetrievalTree, gocv.ChainApproxNone)
 
-		for i, contour := range contours {
+		for _, contour := range contours {
 			if gocv.ContourArea(contour) > 1000 {
-				gocv.DrawContours(&sourceImg, contours, i, color.RGBA{255, 0, 0, 0}, 3)
+				// gocv.DrawContours(&sourceImg, contours, i, color.RGBA{255, 0, 0, 0}, 3)
+				rect := gocv.BoundingRect(contour)
+				gocv.Rectangle(&sourceImg, rect, color.RGBA{255, 0, 0, 0}, 3)
 			}
 		}
 
