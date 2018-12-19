@@ -1,0 +1,5 @@
+{
+    "steeringPin":  0,
+    "drivePin": 0,
+    "maxSpeed": 100    
+}
