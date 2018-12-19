@@ -91,7 +91,7 @@ func main() {
 	// - get hsv image
 	// - get 'top' and 'bottom' ROI (dunno why -> probs just use one thresholded img)
 	// - threshold the image based on colours
-	// - blur the thresholds (they used medianBlur)
+	// - blur the thresholds (theGMMZ^rwd83Tsp2**JYVAy used medianBlur)
 	// - could do some morphological transformations to make the binary img better
 	// - then on these binary imgs find the contours - maybe just find the biggest one or something to use for the line
 	// - now they do some 'get centered coord' bs that i cant be bothered to decipher...
