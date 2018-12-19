@@ -29,7 +29,7 @@ type CVConfig struct {
 	RightUpper HSV `json:"rightUpper"`
 }
 
-func GetPinsConfig() PinConfig {
+func GetPinConfig() PinConfig {
 	var pins PinConfig
 	pinsConfigFile, err := os.Open(os.Getenv("GOPATH") + PINS_CONF_FILE)
 	defer pinsConfigFile.Close()

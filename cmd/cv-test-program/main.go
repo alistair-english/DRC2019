@@ -6,7 +6,7 @@ import (
 
 	"gocv.io/x/gocv"
 
-	"github.com/alistair-english/DRC2019/pkg/gocvhelpers"
+	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
 )
 
 func main() {
@@ -46,6 +46,8 @@ func main() {
 
 	gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 
+	cvhelpers.ReadHSV(webcam, &hsvImg)
+
 	channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
 	// define HSV color upper and lower bound range
@@ -55,8 +57,8 @@ func main() {
 	defer lowerMask.Close()
 	defer upperMask.Close()
 
-	gocvhelpers.HSVMask(gocv.NewScalar(110.0, 100.0, 100.0, 0.0), &lowerMask, channels, rows, cols)
-	gocvhelpers.HSVMask(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), &upperMask, channels, rows, cols)
+	cvhelpers.HSVMask(gocv.NewScalar(110.0, 100.0, 100.0, 0.0), &lowerMask, channels, rows, cols)
+	cvhelpers.HSVMask(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), &upperMask, channels, rows, cols)
 
 	for { // for3vA
 

@@ -1,6 +1,12 @@
-package gocvhelpers
+package cvhelpers
 
 import "gocv.io/x/gocv"
+
+func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
+	tempMat := gocv.NewMat()
+	cam.Read(&tempMat)
+	gocv.CvtColor(tempMat, dst, gocv.ColorBGRToHSV)
+}
 
 // HSVMask creates a HSV mask that can be used in gocv.InRange
 func HSVMask(in gocv.Scalar, dst *gocv.Mat, channels int, rows int, cols int) {
