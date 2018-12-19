@@ -1,9 +1,12 @@
 package main
 
 import (
+	"image"
 	"image/color"
 
 	"gocv.io/x/gocv"
+
+	"github.com/alistair-english/DRC2019/pkg/gocvhelpers"
 )
 
 func main() {
@@ -45,32 +48,15 @@ func main() {
 
 	channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
-	// define HSV color upper and lower bound ranges
-	lower := gocv.NewMatFromScalar(gocv.NewScalar(90.0, 100.0, 150.0, 0.0), gocv.MatTypeCV8UC3)
-	upper := gocv.NewMatFromScalar(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), gocv.MatTypeCV8UC3)
+	// define HSV color upper and lower bound range
+	lowerMask := gocv.NewMat()
+	upperMask := gocv.NewMat()
 
-	// split HSV lower bounds into H, S, V channels
-	lowerChans := gocv.Split(lower)
-	lowerMask := gocv.NewMatWithSize(rows, cols, gocv.MatTypeCV8UC3)
-	lowerMaskChans := gocv.Split(lowerMask)
+	defer lowerMask.Close()
+	defer upperMask.Close()
 
-	// split HSV lower bounds into H, S, V channels
-	upperChans := gocv.Split(upper)
-	upperMask := gocv.NewMatWithSize(rows, cols, gocv.MatTypeCV8UC3)
-	upperMaskChans := gocv.Split(upperMask)
-
-	// copy HSV values to upper and lower masks
-	for c := 0; c < channels; c++ {
-		for i := 0; i < rows; i++ {
-			for j := 0; j < cols; j++ {
-				lowerMaskChans[c].SetUCharAt(i, j, lowerChans[c].GetUCharAt(0, 0))
-				upperMaskChans[c].SetUCharAt(i, j, upperChans[c].GetUCharAt(0, 0))
-			}
-		}
-	}
-
-	gocv.Merge(lowerMaskChans, &lowerMask)
-	gocv.Merge(upperMaskChans, &upperMask)
+	gocvhelpers.HSVMask(gocv.NewScalar(110.0, 100.0, 100.0, 0.0), &lowerMask, channels, rows, cols)
+	gocvhelpers.HSVMask(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), &upperMask, channels, rows, cols)
 
 	for { // for3vA
 
@@ -78,16 +64,10 @@ func main() {
 
 		// gocv.GaussianBlur(sourceImg, &blurredImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
-		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
+		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorRGBToHSV)
 		gocv.InRange(hsvImg, lowerMask, upperMask, &mask)
 
-		// gocv.GaussianBlur(mask, &blurMask, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
-
-		gocv.Merge([]gocv.Mat{mask, mask, mask}, &finalMask)
-
-		// gocv.BitwiseAnd(hsvImg, finalMask, &hsvImg)
-
-		// gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorHSVToBGR)
+		gocv.GaussianBlur(mask, &blurMask, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
 		contours := gocv.FindContours(mask, gocv.RetrievalTree, gocv.ChainApproxNone)
 
@@ -100,6 +80,8 @@ func main() {
 		}
 
 		maskWindow.IMShow(mask)
+
+		// gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorHSVToBGR)
 
 		sourceWindow.IMShow(sourceImg)
 
