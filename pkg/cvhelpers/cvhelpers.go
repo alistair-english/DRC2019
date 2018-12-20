@@ -1,9 +1,18 @@
 package cvhelpers
 
-import "gocv.io/x/gocv"
+import (
+	"image"
 
+	"gocv.io/x/gocv"
+
+	"github.com/alistair-english/DRC2019/pkg/gohelpers"
+)
+
+// ReadHSV will read in an image from the supplied VideoCapture and output a HSV file to dst
 func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
 	tempMat := gocv.NewMat()
+	defer tempMat.Close()
+
 	cam.Read(&tempMat)
 	gocv.CvtColor(tempMat, dst, gocv.ColorBGRToHSV)
 }
@@ -12,6 +21,7 @@ func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
 func HSVMask(in gocv.Scalar, dst *gocv.Mat, channels int, rows int, cols int) {
 
 	source := gocv.NewMatFromScalar(in, gocv.MatTypeCV8UC3)
+	defer source.Close()
 
 	// input is a 1x1x3 with the 3 HSV values we need
 	inputChannels := gocv.Split(source)
@@ -30,4 +40,22 @@ func HSVMask(in gocv.Scalar, dst *gocv.Mat, channels int, rows int, cols int) {
 	}
 
 	gocv.Merge(maskChannels, dst)
+}
+
+// FindLargestContour finds the largest contour in a binary image using some default settings and returns the countour
+func FindLargestContour(in gocv.Mat) []image.Point {
+	contours := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
+
+	if len(contours) == 0 {
+		return nil
+	}
+
+	var areas []float64
+	for _, contour := range contours {
+		areas = append(areas, gocv.ContourArea(contour))
+	}
+
+	i, _ := gohelpers.MaxFloat64(areas)
+
+	return contours[i]
 }

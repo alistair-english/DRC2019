@@ -1,6 +1,10 @@
 package main
 
 import (
+	"image"
+	"image/color"
+	"os"
+
 	"github.com/alistair-english/DRC2019/internal/pkg/config"
 	"gocv.io/x/gocv"
 
@@ -20,12 +24,14 @@ func main() {
 
 	// Image Mats
 	var (
-		hsvImg   = gocv.NewMat()
-		mask     = gocv.NewMat()
-		maskBlur = gocv.NewMat()
+		sourceImg = gocv.NewMat()
+		hsvImg    = gocv.NewMat()
+		mask      = gocv.NewMat()
+		maskBlur  = gocv.NewMat()
 	)
 
 	// Image closes
+	defer sourceImg.Close()
 	defer hsvImg.Close()
 	defer mask.Close()
 	defer maskBlur.Close()
@@ -45,12 +51,34 @@ func main() {
 	cvhelpers.HSVMask(gocv.NewScalar(cvConfig.LeftUpper.H, cvConfig.LeftUpper.S, cvConfig.LeftUpper.V, 0.0), &upperMask, channels, rows, cols)
 
 	for { // inifinte loop
-		cvhelpers.ReadHSV(cam, &hsvImg)
 
+		// get the image
+		cam.Read(&sourceImg)
+
+		// blur the image
+		gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{5, 5}, 0, 0, gocv.BorderReflect101)
+
+		// convert to HSV
+		gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
+
+		// Apply the threshold
 		gocv.InRange(hsvImg, lowerMask, upperMask, &mask)
 
-		// gocv.GaussianBlur(mask, &maskBlur, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
+		// Blur the mask
+		gocv.GaussianBlur(mask, &maskBlur, image.Point{5, 5}, 0, 0, gocv.BorderReflect101)
 
+		// Find largest contour
+		contour := cvhelpers.FindLargestContour(mask)
+
+		// Draw contour on source img
+		if contour != nil {
+			rect := gocv.BoundingRect(contour)
+			gocv.Rectangle(&sourceImg, rect, color.RGBA{255, 0, 0, 0}, 3)
+		}
+
+		os.Open()
+
+		// Display source img
 		displayWindow.IMShow(mask)
 		displayWindow.WaitKey(1)
 	}
