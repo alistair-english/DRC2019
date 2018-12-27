@@ -1,5 +1,7 @@
 package cvhelpers
 
+//TODO: Move this package to internal
+
 import (
 	"image"
 
@@ -58,4 +60,67 @@ func FindLargestContour(in gocv.Mat) []image.Point {
 	i, _ := gohelpers.MaxFloat64(areas)
 
 	return contours[i]
+}
+
+// Thresholds is a struct that contains upper and lower colour bounds in the form of gocv.Scalar
+type Thresholds struct {
+	lower gocv.Scalar
+	upper gocv.Scalar
+}
+
+// HSVMasks is a struct that contains upper and lower HSV masks that can be generated with cvhelpers.HSVMask
+type HSVMasks struct {
+	lower gocv.Mat
+	upper gocv.Mat
+}
+
+// HSVObject describes an object with a name and a HSV masks
+type HSVObject struct {
+	name  string
+	masks HSVMasks
+}
+
+type HSVObjectResult struct {
+	name        string
+	countour    []image.Point
+	boundingBox image.Rectangle
+}
+
+func NewHSVObject(name string, lowerMask gocv.Mat, upperMask gocv.Mat) HSVObject {
+	return HSVObject{
+		name,
+		HSVMasks{
+			lowerMask,
+			upperMask,
+		},
+	}
+}
+
+// FindHSVObjects finds all HSVObjects from a []cvhelpers.HSVObject in a given image
+func FindHSVObjects(img gocv.Mat, objects []HSVObject) []HSVObjectResult {
+
+	tempMask := gocv.NewMat()
+	defer tempMask.Close()
+
+	results := make([]HSVObjectResult, len(objects))
+
+	for i, obj := range objects {
+		// Find the object
+		gocv.InRange(img, obj.masks.lower, obj.masks.upper, &tempMask)
+
+		// Find the largest contour
+		contour := FindLargestContour(tempMask)
+		results[i].countour = contour
+
+		// Find the bounding box
+		if contour != nil {
+			rect := gocv.BoundingRect(contour)
+			results[i].boundingBox = rect
+		}
+
+		// Copy the name
+		results[i].name = obj.name
+	}
+
+	return results
 }
