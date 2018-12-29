@@ -19,11 +19,13 @@ func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
 	gocv.CvtColor(tempMat, dst, gocv.ColorBGRToHSV)
 }
 
-// HSVMask creates a HSV mask that can be used in gocv.InRange
-func HSVMask(in gocv.Scalar, dst *gocv.Mat, channels int, rows int, cols int) {
+// NewHSVMask creates a HSV mask that can be used in gocv.InRange
+func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) gocv.Mat {
 
 	source := gocv.NewMatFromScalar(in, gocv.MatTypeCV8UC3)
 	defer source.Close()
+
+	output := gocv.NewMat()
 
 	// input is a 1x1x3 with the 3 HSV values we need
 	inputChannels := gocv.Split(source)
@@ -41,7 +43,9 @@ func HSVMask(in gocv.Scalar, dst *gocv.Mat, channels int, rows int, cols int) {
 		}
 	}
 
-	gocv.Merge(maskChannels, dst)
+	gocv.Merge(maskChannels, &output)
+
+	return output
 }
 
 // FindLargestContour finds the largest contour in a binary image using some default settings and returns the countour
@@ -64,28 +68,33 @@ func FindLargestContour(in gocv.Mat) []image.Point {
 
 // Thresholds is a struct that contains upper and lower colour bounds in the form of gocv.Scalar
 type Thresholds struct {
-	lower gocv.Scalar
-	upper gocv.Scalar
+	Lower gocv.Scalar
+	Upper gocv.Scalar
 }
 
 // HSVMasks is a struct that contains upper and lower HSV masks that can be generated with cvhelpers.HSVMask
 type HSVMasks struct {
-	lower gocv.Mat
-	upper gocv.Mat
+	Lower gocv.Mat
+	Upper gocv.Mat
 }
 
 // HSVObject describes an object with a name and a HSV masks
 type HSVObject struct {
-	name  string
-	masks HSVMasks
+	Name  string
+	Masks HSVMasks
 }
 
+// HSVObjectResult describes an object found with cvhelpers.FindHSVObjects
 type HSVObjectResult struct {
-	name        string
-	countour    []image.Point
-	boundingBox image.Rectangle
+	Name        string
+	Countour    []image.Point
+	BoundingBox image.Rectangle
 }
 
+// ImageMod is a function to be defined by the user to do some specific processing to a given src image gocv.Mat and output it to dst
+type ImageMod func(src gocv.Mat, dst *gocv.Mat)
+
+// NewHSVObject creates a new cvhelpers.HSVObject
 func NewHSVObject(name string, lowerMask gocv.Mat, upperMask gocv.Mat) HSVObject {
 	return HSVObject{
 		name,
@@ -97,7 +106,7 @@ func NewHSVObject(name string, lowerMask gocv.Mat, upperMask gocv.Mat) HSVObject
 }
 
 // FindHSVObjects finds all HSVObjects from a []cvhelpers.HSVObject in a given image
-func FindHSVObjects(img gocv.Mat, objects []HSVObject) []HSVObjectResult {
+func FindHSVObjects(img gocv.Mat, objects []HSVObject, processMask ImageMod) []HSVObjectResult {
 
 	tempMask := gocv.NewMat()
 	defer tempMask.Close()
@@ -106,20 +115,23 @@ func FindHSVObjects(img gocv.Mat, objects []HSVObject) []HSVObjectResult {
 
 	for i, obj := range objects {
 		// Find the object
-		gocv.InRange(img, obj.masks.lower, obj.masks.upper, &tempMask)
+		gocv.InRange(img, obj.Masks.Lower, obj.Masks.Upper, &tempMask)
+
+		// Apply any user processing
+		processMask(tempMask, &tempMask)
 
 		// Find the largest contour
 		contour := FindLargestContour(tempMask)
-		results[i].countour = contour
+		results[i].Countour = contour
 
 		// Find the bounding box
 		if contour != nil {
 			rect := gocv.BoundingRect(contour)
-			results[i].boundingBox = rect
+			results[i].BoundingBox = rect
 		}
 
 		// Copy the name
-		results[i].name = obj.name
+		results[i].Name = obj.Name
 	}
 
 	return results
