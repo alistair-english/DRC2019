@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 
 	"github.com/alistair-english/DRC2019/internal/pkg/config"
 	"gocv.io/x/gocv"
@@ -121,7 +122,14 @@ func main() {
 		result := cvhelpers.FindHSVObjects(hsvImg, objects, processMask)
 
 		for _, obj := range result {
-			fmt.Println(obj.BoundingBox)
+			var colour color.RGBA
+			if obj.Name == LEFT_LINE {
+				colour = color.RGBA{255, 0, 0, 0}
+			} else if obj.Name == RIGHT_LINE {
+				colour = color.RGBA{0, 255, 0, 0}
+			}
+
+			gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
 		}
 		fmt.Println()
 
