@@ -113,7 +113,7 @@ func main() {
 		cam.Read(&sourceImg)
 
 		// blur the image
-		gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{5, 5}, 0, 0, gocv.BorderReflect101)
+		gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
 		// convert to HSV
 		gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
@@ -129,7 +129,9 @@ func main() {
 				colour = color.RGBA{0, 255, 0, 0}
 			}
 
-			gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
+			if obj.Area > 1000 {
+				gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
+			}
 		}
 		fmt.Println()
 

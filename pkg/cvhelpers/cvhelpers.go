@@ -89,6 +89,7 @@ type HSVObjectResult struct {
 	Name        string
 	Countour    []image.Point
 	BoundingBox image.Rectangle
+	Area        float64
 }
 
 // ImageMod is a function to be defined by the user to do some specific processing to a given src image gocv.Mat and output it to dst
@@ -126,8 +127,8 @@ func FindHSVObjects(img gocv.Mat, objects []HSVObject, processMask ImageMod) []H
 
 		// Find the bounding box
 		if contour != nil {
-			rect := gocv.BoundingRect(contour)
-			results[i].BoundingBox = rect
+			results[i].BoundingBox = gocv.BoundingRect(contour)
+			results[i].Area = gocv.ContourArea(contour)
 		}
 
 		// Copy the name

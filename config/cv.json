@@ -2,7 +2,7 @@
     "leftLower": {
         "H": 90,
         "S": 100,
-        "V": 80
+        "V": 120
     },
 
     "leftUpper": {
@@ -14,7 +14,7 @@
     "rightLower": {
         "H": 110,
         "S": 100,
-        "V": 100
+        "V": 150
     },
 
     "rightUpper": {
