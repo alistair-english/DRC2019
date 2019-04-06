@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
@@ -133,7 +132,7 @@ func main() {
 				gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
 			}
 		}
-		fmt.Println()
+		// fmt.Println()
 
 		// Display source img
 		displayWindow.IMShow(sourceImg)
