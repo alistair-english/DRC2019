@@ -16,3 +16,7 @@
 
 # VSCode
 .vscode/*
+
+# MacOS Metadata
+.DS_Store
+.README.md.swp
