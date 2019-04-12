@@ -2,21 +2,24 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/alistair-english/DRC2019/internal/pkg/config"
-	"gocv.io/x/gocv"
 	"image"
-	_ "image/color"
 	_ "image/png"
 	"log"
 	"os"
+
+	_ "github.com/alistair-english/DRC2019/internal/pkg/config"
+	"gocv.io/x/gocv"
 )
 
 func main() {
 	var img = gocv.NewMat()
+	var mask = gocv.NewMat()
+	defer mask.Close()
 	defer img.Close()
 
 	img, _ = openImage("../../testImages/testLineLeft.png")
-	findPoints(img)
+	mask = convertToBitmask(img)
+	findPoints(mask)
 }
 
 func toRGB8(img image.Image) (gocv.Mat, error) {
@@ -46,6 +49,12 @@ func openImage(path string) (gocv.Mat, error) {
 	img, _, _ := image.Decode(fimag)
 
 	return toRGB8(img)
+}
+
+func convertToBitmask(mat gocv.Mat) gocv.Mat {
+	mask := gocv.NewMat()
+	gocv.InRangeWithScalar(mat, gocv.Scalar{Val1: 128.0, Val2: 128.0, Val3: 128.0, Val4: 0.1}, gocv.Scalar{Val1: 255.0, Val2: 255.0, Val3: 255.0, Val4: 1.0}, &mask)
+	return mask
 }
 
 func findPoints(mat gocv.Mat) {
