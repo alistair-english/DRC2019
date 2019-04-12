@@ -1,13 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"image"
-	"image/color"
 
 	"github.com/alistair-english/DRC2019/internal/pkg/config"
-	"gocv.io/x/gocv"
-
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
+	"gocv.io/x/gocv"
 )
 
 func main() {
@@ -32,79 +31,62 @@ func main() {
 		hsvImg    = gocv.NewMat()
 	)
 
+	// Masks
+	var (
+		leftMask  = gocv.NewMat()
+		rightMask = gocv.NewMat()
+	)
+
 	// Image closes
 	defer sourceImg.Close()
 	defer hsvImg.Close()
+	defer leftMask.Close()
+	defer rightMask.Close()
 
 	cvhelpers.ReadHSV(cam, &hsvImg)
 
 	// Calculate our HSV masks
 	channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
-	var processMask cvhelpers.ImageMod = func(src gocv.Mat, dst *gocv.Mat) {
-		// Blur the mask
-		// gocv.GaussianBlur(mask, &maskBlur, image.Point{5, 5}, 0, 0, gocv.BorderReflect101)
-		return
-	}
+	leftLower := cvhelpers.NewHSVMask(
+		gocv.NewScalar(
+			cvConfig.LeftLower.H,
+			cvConfig.LeftLower.S,
+			cvConfig.LeftLower.V,
+			0.0),
+		channels,
+		rows,
+		cols)
 
-	// Create objects slice
-	objects := []cvhelpers.HSVObject{
-		cvhelpers.NewHSVObject(
-			LEFT_LINE,
+	leftUpper := cvhelpers.NewHSVMask(
+		gocv.NewScalar(
+			cvConfig.LeftUpper.H,
+			cvConfig.LeftUpper.S,
+			cvConfig.LeftUpper.V,
+			0.0),
+		channels,
+		rows,
+		cols)
 
-			cvhelpers.NewHSVMask(
-				gocv.NewScalar(
-					cvConfig.LeftLower.H,
-					cvConfig.LeftLower.S,
-					cvConfig.LeftLower.V,
-					0.0),
-				channels,
-				rows,
-				cols),
+	rightLower := cvhelpers.NewHSVMask(
+		gocv.NewScalar(
+			cvConfig.RightLower.H,
+			cvConfig.RightLower.S,
+			cvConfig.RightLower.V,
+			0.0),
+		channels,
+		rows,
+		cols)
 
-			cvhelpers.NewHSVMask(
-				gocv.NewScalar(
-					cvConfig.LeftUpper.H,
-					cvConfig.LeftUpper.S,
-					cvConfig.LeftUpper.V,
-					0.0),
-				channels,
-				rows,
-				cols),
-		),
-
-		cvhelpers.NewHSVObject(
-			RIGHT_LINE,
-
-			cvhelpers.NewHSVMask(
-				gocv.NewScalar(
-					cvConfig.RightLower.H,
-					cvConfig.RightLower.S,
-					cvConfig.RightLower.V,
-					0.0),
-				channels,
-				rows,
-				cols),
-
-			cvhelpers.NewHSVMask(
-				gocv.NewScalar(
-					cvConfig.RightUpper.H,
-					cvConfig.RightUpper.S,
-					cvConfig.RightUpper.V,
-					0.0),
-				channels,
-				rows,
-				cols),
-		),
-	}
-
-	// Cleanup masks afer use
-	defer func() {
-		for i := range objects {
-			objects[i].Masks.Lower.Close()
-			objects[i].Masks.Upper.Close()
-		}
-	}()
+	rightUpper := cvhelpers.NewHSVMask(
+		gocv.NewScalar(
+			cvConfig.RightUpper.H,
+			cvConfig.RightUpper.S,
+			cvConfig.RightUpper.V,
+			0.0),
+		channels,
+		rows,
+		cols)
 
 	for { // inifinte loop
 
@@ -117,26 +99,15 @@ func main() {
 		// convert to HSV
 		gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
 
-		// Find the HSV objects in the image
-		result := cvhelpers.FindHSVObjects(hsvImg, objects, processMask)
+		// Left mask
+		gocv.InRange(hsvImg, leftLower, leftUpper, &leftMask)
 
-		for _, obj := range result {
-			var colour color.RGBA
-			if obj.Name == LEFT_LINE {
-				colour = color.RGBA{255, 0, 0, 0}
-			} else if obj.Name == RIGHT_LINE {
-				colour = color.RGBA{0, 255, 0, 0}
-			}
+		// Right mask
+		gocv.InRange(hsvImg, rightLower, rightUpper, &rightMask)
 
-			if obj.Area > 1000 {
-				gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
-			}
-		}
-		// fmt.Println()
+		fmt.Println(leftMask.GetIntAt(0, 0))
 
-		// Display source img
-		displayWindow.IMShow(sourceImg)
+		displayWindow.IMShow(leftMask)
 		displayWindow.WaitKey(1)
 	}
-
 }
