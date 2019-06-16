@@ -130,9 +130,7 @@ func main() {
 				colour = color.RGBA{0, 255, 0, 0}
 			}
 
-			if obj.Area > 1000 {
-				gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
-			}
+			gocv.Rectangle(&sourceImg, obj.BoundingBox, colour, 3)
 		}
 		// fmt.Println()
 
