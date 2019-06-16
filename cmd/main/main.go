@@ -4,9 +4,9 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/alistair-english/DRC2019/internal/pkg/config"
 	"gocv.io/x/gocv"
 
+	"github.com/alistair-english/DRC2019/internal/pkg/config"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
 )
 
@@ -22,6 +22,8 @@ func main() {
 
 	cam, _ := gocv.VideoCaptureDevice(0)
 	defer cam.Close()
+
+	cam.Set(gocv.VideoCaptureBrightness, 120)
 
 	displayWindow := gocv.NewWindow("Display")
 	defer displayWindow.Close()
