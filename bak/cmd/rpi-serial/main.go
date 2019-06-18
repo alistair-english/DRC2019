@@ -8,6 +8,7 @@ import (
 
 func main() {
 	// Setup serial options
+	log.Printf("Starting rpi-serial.go")
 	options := serial.OpenOptions{
 		PortName:        "/dev/yeetPort",
 		BaudRate:        115200,
