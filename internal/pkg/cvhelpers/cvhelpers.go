@@ -7,7 +7,7 @@ import (
 
 	"gocv.io/x/gocv"
 
-	"github.com/alistair-english/DRC2019/pkg/gohelpers"
+	"github.com/alistair-english/DRC2019/internal/pkg/gohelpers"
 )
 
 // ReadHSV will read in an image from the supplied VideoCapture and output a HSV file to dst
