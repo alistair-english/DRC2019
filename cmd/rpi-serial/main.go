@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/alistair-english/DRC2019/pkg/logginghelpers"
-	"github.com/tarm/serial"
 	"log"
 	"os"
 	"time"
+
+	"github.com/tarm/serial"
 )
 
 func main() {
