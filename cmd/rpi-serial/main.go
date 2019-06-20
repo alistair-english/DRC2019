@@ -8,11 +8,40 @@ import (
 	t "time"
 )
 
+// Serial info configs, we can put this in a pkg later to make neat
 const (
 	serialPacketSize = 100 // Filler value
 	serialSync1      = 255 // Filler
 	serialSync2      = 255 // Filler
 )
+
+// MsgType contains all serial message types
+type MsgType int
+
+// Enum Eq for messages
+const (
+	Message    MsgType = 0
+	PowerReq   MsgType = 1
+	PowerConf  MsgType = 2
+	PowerDeny  MsgType = 3
+	ForceReset MsgType = 4
+	ForceStop  MsgType = 5
+)
+
+// SerialHeader is the header information for the serial comms
+type SerialHeader struct {
+	Sync1 uint8
+	Sync2 uint8
+	Type  uint8
+	Size  uint8
+}
+
+// QueueMsg contains the actual data
+type QueueMsg struct {
+	Type uint8
+	Size uint8
+	Data *uint8
+}
 
 func main() {
 	// Setup a stream for file logging
@@ -50,6 +79,7 @@ func main() {
 	writeChan := make(chan []byte) // Not sure if we should defer close or close these?
 	readChan := make(chan []byte)
 
+	// Write goroutine to send serial data
 	go func(writeChannel chan []byte) {
 		// Iterate over the channel looking for new stuff to shoot out over serial
 		for v := range writeChannel {
@@ -57,11 +87,12 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			// Debug Delay
+			// Debug Delay yeet delet this when actually doing stuff
 			t.Sleep(1000 * t.Millisecond)
 		}
 	}(writeChan)
 
+	// Read goroutine to recieve serial data
 	go func(readChannel chan []byte) {
 		for {
 			buf := make([]byte, 255)
@@ -72,11 +103,11 @@ func main() {
 				// We potentially have enought data for serial
 				// Now check for serial sync characters
 				for i := n; i >= serialPacketSize; i-- {
-					if buf[i] == serialSync1 && buf[i+1] == serialSync2 {
+					if uint8(buf[i]) == serialSync1 && uint8(buf[i+1]) == serialSync2 {
 						// We are synced up and have an entire packet
-						dataPacket := make([]byte, serialPacketSize-2)
+						dataPacket := make([]byte, serialPacketSize)
 						// Copy the data without sync to the dataPacket buffer
-						n := copy(dataPacket, buf[i+2:i+serialPacketSize+1]) //If we are truncating data, this will be the issue
+						n := copy(dataPacket, buf[i:i+serialPacketSize]) //If we are truncating data, this will be the issue
 						if n != serialPacketSize {
 							log.Fatal("Somehow we lost count of our buffer")
 						}
@@ -84,6 +115,15 @@ func main() {
 					}
 				}
 			}
+		}
+	}(readChan)
+
+	// Goroutine to parse instructions from ESP
+	go func(readChannel chan []byte) {
+		// TODO: Read in the instructions from ESP
+		for v := range readChannel {
+			// TODO
+			log.Println(v) // Filler to get rid of errors
 		}
 	}(readChan)
 }
