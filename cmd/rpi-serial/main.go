@@ -80,7 +80,7 @@ func main() {
 	readChan := make(chan []byte)
 
 	// Write goroutine to send serial data
-	go func(writeChannel chan []byte) {
+	go func(writeChannel <-chan []byte) {
 		// Iterate over the channel looking for new stuff to shoot out over serial
 		for v := range writeChannel {
 			_, err := port.Write(v)
@@ -93,7 +93,7 @@ func main() {
 	}(writeChan)
 
 	// Read goroutine to recieve serial data
-	go func(readChannel chan []byte) {
+	go func(readChannel chan<- []byte) {
 		for {
 			buf := make([]byte, 255)
 			n, _ := port.Read(buf)
@@ -119,7 +119,7 @@ func main() {
 	}(readChan)
 
 	// Goroutine to parse instructions from ESP
-	go func(readChannel chan []byte) {
+	go func(readChannel <-chan []byte) {
 		// TODO: Read in the instructions from ESP
 		for v := range readChannel {
 			// TODO
