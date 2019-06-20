@@ -33,6 +33,11 @@ type CVConfig struct {
 	RightUpper HSV `json:"rightUpper"`
 }
 
+// CAMConfig is the datatype for the CAM information
+type CAMConfig struct {
+	Port string `json:"port"`
+}
+
 // GetPinConfig gets the pin configuration information from a json file
 func GetPinConfig() PinConfig {
 	var pins PinConfig
@@ -60,14 +65,14 @@ func GetCVConfig() CVConfig {
 }
 
 // GetCameraConfig gets the camera configuration information from a json file
-func GetCameraConfig() string {
-	var ccf string `json:"port"`
+func GetCameraConfig() CAMConfig {
+	var ccf CAMConfig
 	camConfigFile, err := os.Open(os.Getenv("GOPATH") + CAM_CONF_FILE)
 	defer camConfigFile.Close()
 	if err != nil {
 		panic(err)
 	}
 	jsonParser := json.NewDecoder(camConfigFile)
-	jsonParser.Decpde(&ccf)
+	jsonParser.Decode(&ccf)
 	return ccf
 }
