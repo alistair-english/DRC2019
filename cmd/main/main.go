@@ -7,28 +7,28 @@ import (
 
 func main() {
 	// Setup
+	camImg := gocv.NewMat()
+	defer camImg.Close()
+
 	cam := camera.FakeCamera{}
-	camConn := camera.NewConnection(cam)
+	camConn := camera.NewConnection(cam, &camImg)
 
 	displayWindow := gocv.NewWindow("Display")
 	defer displayWindow.Close()
 
-	camConn.ImageRequest <- true
+	camConn.RequestImage()
 
 	for {
 		select {
-		case img := <-camConn.ImageResult:
+		case <-camConn.ImageResult:
 
 			// Code to handle an image is ready
 			// e.g. process img - this realllyyy needs to be a goroutine otherwise huge block
-			displayWindow.IMShow(img)
+			displayWindow.IMShow(camImg)
 			displayWindow.WaitKey(1)
 
-			// This is the gnarly part - need to remeber to ALWAYS close the img or ez mem leak
-			img.Close()
-
 			// Then request another image
-			camConn.ImageRequest <- true
+			camConn.RequestImage()
 		}
 	}
 }
