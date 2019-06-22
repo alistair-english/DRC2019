@@ -5,3 +5,6 @@
 
 # GOCV Install
 - https://github.com/hybridgroup/gocv
+
+# Serial Setup
+ - https://www.raspberrypi.org/documentation/configuration/uart.md
