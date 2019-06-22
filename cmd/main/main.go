@@ -29,7 +29,7 @@ func main() {
 
 	// Serial Setup
 	serialConfig := config.GetSerialConfig()
-	ser := serial.NewPiSerial(
+	ser, _ := serial.NewPiSerial(
 		serialConfig.Port,
 		serialConfig.Baud,
 		time.Duration(serialConfig.TimeoutMs)*time.Millisecond,
