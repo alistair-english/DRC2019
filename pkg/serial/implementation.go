@@ -9,7 +9,6 @@ import (
 
 //Implementation is the interface for serial
 type Implementation interface {
-	Init() error
 	RunSerialTx(writeChan <-chan []byte) error
 	RunSerialRx(readChan chan<- []byte) error
 }
@@ -23,33 +22,23 @@ type PiSerial struct {
 }
 
 // NewPiSerial creates a new PiSerial object
-func NewPiSerial(port string, baud int, timeout t.Duration) *PiSerial {
-	return &PiSerial{
-		port,
-		baud,
-		timeout,
-		nil,
-	}
-}
-
-// Init begins some serial stuff
-func (s PiSerial) Init() error {
+func NewPiSerial(port string, baud int, timeout t.Duration) (*PiSerial, error) {
 	// Setup serial options
 	options := serial.Config{
-		Name:        s.Port,
-		Baud:        s.Baud,
-		ReadTimeout: s.Timeout,
+		Name:        port,
+		Baud:        baud,
+		ReadTimeout: timeout,
 		Size:        8,
 		StopBits:    1,
 		Parity:      'N',
 	}
 	// Init the Serial port
-	port, err := serial.OpenPort(&options)
-	s.connection = port
+	conn, err := serial.OpenPort(&options)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	return &PiSerial{port, baud, timeout, conn}, nil
 }
 
 // RunSerialTx starts serial tx
