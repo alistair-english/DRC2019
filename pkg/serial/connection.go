@@ -1,10 +1,14 @@
 package serial
 
+import (
+	"github.com/alistair-english/DRC2019/pkg/gohelpers"
+)
+
 // Connection e
 type Connection struct {
 	ControlChan          chan Control
-	PowerReqChan         chan PowerReq
-	LogMsgChan           chan LogMsg
+	PowerReqChan         chan PowerRequest
+	LogMsgChan           chan LogMessage
 	PowerReqResponseChan chan PowerReqResponse
 	writeChan            chan []byte
 	readChan             chan []byte
@@ -15,8 +19,8 @@ type Connection struct {
 func NewConnection(serial Implementation) (*Connection, error) {
 	// External Channels
 	controlChan := make(chan Control, 20)
-	powerReqChan := make(chan PowerReq, 20)
-	logMSgChan := make(chan LogMsg, 20)
+	powerReqChan := make(chan PowerRequest, 20)
+	logMSgChan := make(chan LogMessage, 20)
 	powerReqResponse := make(chan PowerReqResponse, 20)
 
 	// Internal Channels
@@ -24,6 +28,8 @@ func NewConnection(serial Implementation) (*Connection, error) {
 	readChan := make(chan []byte, 20)
 
 	c := Connection{controlChan, powerReqChan, logMSgChan, powerReqResponse, writeChan, readChan, serial}
+
+	go c.HandleChannels()
 
 	return &c, nil
 }
@@ -41,5 +47,58 @@ func (c Connection) Init() error {
 
 // HandleChannels handles channels
 func (c Connection) HandleChannels() {
+	// Goroutine for handling the control channel
+	go func(in <-chan Control, out chan<- []byte) {
+		for con := range in {
+			buf := make([]byte, SerialHeaderSize+2)
+			buf[0] = byte(0xB5)
+			buf[1] = byte(0x62)
+			buf[2] = byte(Data)
+			buf[3] = byte(2)
+			buf[4] = byte(con.dir)
+			buf[5] = byte(con.spd)
 
+			out <- buf
+		}
+	}(c.ControlChan, c.writeChan)
+
+	// Goroutine for handling the power requests from ESP
+	go func(in <-chan []byte, out chan<- PowerRequest) {
+		for con := range in {
+			var req PowerRequest
+			req.reqType = uint8(con[SerialHeaderSize])
+
+			out <- req
+		}
+	}(c.readChan, c.PowerReqChan)
+
+	// Goroutine for handling log messages
+	go func(in <-chan LogMessage, out chan<- []byte) {
+		for con := range in {
+			buf := make([]byte, SerialHeaderSize+len(con.msg))
+			buf[0] = byte(0xB5)
+			buf[1] = byte(0x62)
+			buf[2] = byte(LogMsg)
+			buf[3] = byte(len(buf))
+			msgBytes := []byte(con.msg)
+			copy(buf[4:], msgBytes) //This might need to be 3 not 4
+
+			out <- buf
+		}
+	}(c.LogMsgChan, c.writeChan)
+
+	// Goroutine for handling power request responses
+	go func(in <-chan PowerReqResponse, out chan<- []byte) {
+		for con := range in {
+			buf := make([]byte, SerialHeaderSize+1)
+			buf[0] = byte(0xB5)
+			buf[1] = byte(0x62)
+			buf[2] = byte(PowerReq)
+			buf[3] = byte(1)
+			accept := gohelpers.B2i(con.accept)
+			buf[4] = byte(accept)
+
+			out <- buf
+		}
+	}(c.PowerReqResponseChan, c.readChan)
 }

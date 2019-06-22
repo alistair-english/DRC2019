@@ -14,3 +14,11 @@ func MaxFloat64(slice []float64) (i int, val float64) {
 
 	return maxI, maxV
 }
+
+// B2i converts a boolean to an integer
+func B2i(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}

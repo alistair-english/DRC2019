@@ -6,8 +6,8 @@ type Control struct {
 	spd int8 // Speed = -100 -> 100
 }
 
-// PowerReq is the structure for ESP -> Pi power requests
-type PowerReq struct {
+// PowerRequest is the structure for ESP -> Pi power requests
+type PowerRequest struct {
 	reqType uint8
 }
 
@@ -16,16 +16,30 @@ type PowerReqResponse struct {
 	accept bool
 }
 
-// LogMsg contains a log message for ESP to log to webserver
-type LogMsg struct {
+// LogMessage contains a log message for ESP to log to webserver
+type LogMessage struct {
 	msg string
 }
 
 // Serial info configs, we can put this in a pkg later to make neat
 const (
-	SerialHeaderSize = 32  // Filler value
+	SerialHeaderSize = 4   // Yeet
 	SerialSync1      = 255 // Filler
 	SerialSync2      = 255 // Filler
+)
+
+// MsgType contains all serial message types
+type MsgType int
+
+// Regular Msg
+const (
+	Data       MsgType = 0
+	PowerReq   MsgType = 1
+	PowerConf  MsgType = 2
+	PowerDeny  MsgType = 3
+	ForceReset MsgType = 4
+	ForceStop  MsgType = 5
+	LogMsg     MsgType = 6
 )
 
 // Header is the header information for the serial comms
