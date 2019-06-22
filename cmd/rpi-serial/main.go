@@ -10,7 +10,7 @@ import (
 
 // Serial info configs, we can put this in a pkg later to make neat
 const (
-	serialPacketSize = 100 // Filler value
+	serialHeaderSize = 32  // Filler value
 	serialSync1      = 255 // Filler
 	serialSync2      = 255 // Filler
 )
@@ -34,13 +34,6 @@ type SerialHeader struct {
 	Sync2 uint8
 	Type  uint8
 	Size  uint8
-}
-
-// QueueMsg contains the actual data
-type QueueMsg struct {
-	Type uint8
-	Size uint8
-	Data *uint8
 }
 
 func main() {
@@ -99,19 +92,30 @@ func main() {
 			n, _ := port.Read(buf)
 			if n == 0 {
 				// Failed to read from port in 10ms
-			} else if n >= serialPacketSize {
+			} else if n >= serialHeaderSize {
 				// We potentially have enought data for serial
 				// Now check for serial sync characters
-				for i := n; i >= serialPacketSize; i-- {
+				for i := n; i >= serialHeaderSize; i-- {
 					if uint8(buf[i]) == serialSync1 && uint8(buf[i+1]) == serialSync2 {
 						// We are synced up and have an entire packet
-						dataPacket := make([]byte, serialPacketSize)
+						dataPacket := make([]byte, serialHeaderSize)
 						// Copy the data without sync to the dataPacket buffer
-						n := copy(dataPacket, buf[i:i+serialPacketSize]) //If we are truncating data, this will be the issue
-						if n != serialPacketSize {
+						n := copy(dataPacket, buf[i:i+serialHeaderSize]) //If we are truncating data, this will be the issue
+						if n != serialHeaderSize {
 							log.Fatal("Somehow we lost count of our buffer")
 						}
-						readChannel <- dataPacket
+						// We have a serial header, decode it and read in the memory
+						headerPacket := decodeHeaderPacket(dataPacket)
+						if headerPacket.Size == 0 {
+							log.Fatal("No data in packet")
+						}
+						packetBuf := make([]byte, headerPacket.Size)
+						nn, _ := port.Read(packetBuf)
+						if uint8(nn) < headerPacket.Size {
+							log.Fatal("We somehow expected more data than we got")
+						}
+						// Place the raw data on a channel to be handled
+						readChannel <- packetBuf
 					}
 				}
 			}
@@ -126,4 +130,16 @@ func main() {
 			log.Println(v) // Filler to get rid of errors
 		}
 	}(readChan)
+}
+
+func decodeHeaderPacket(arr []byte) SerialHeader {
+	var packet SerialHeader
+
+	// Decode a packet header into the SerialHeader datatype
+	packet.Sync1 = arr[0]
+	packet.Sync2 = arr[1]
+	packet.Type = arr[2]
+	packet.Size = arr[3]
+
+	return packet
 }
