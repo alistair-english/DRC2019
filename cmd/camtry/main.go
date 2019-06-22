@@ -11,7 +11,7 @@ func main() {
 	//defer displayWindow.Close()
 
 	for {
-		cmd := exec.Command("raspistill", "-o", "-")
+		cmd := exec.Command("raspistill", "-o", "-", "-t", "1")
 		data, err := cmd.Output()
 		if err != nil {
 			fmt.Println(err)
