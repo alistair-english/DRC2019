@@ -55,8 +55,8 @@ func (c Connection) HandleChannels() {
 			buf[1] = byte(0x62)
 			buf[2] = byte(Data)
 			buf[3] = byte(2)
-			buf[4] = byte(con.dir)
-			buf[5] = byte(con.spd)
+			buf[4] = byte(con.Dir)
+			buf[5] = byte(con.Spd)
 
 			out <- buf
 		}
@@ -66,7 +66,7 @@ func (c Connection) HandleChannels() {
 	go func(in <-chan []byte, out chan<- PowerRequest) {
 		for con := range in {
 			var req PowerRequest
-			req.reqType = uint8(con[SerialHeaderSize])
+			req.ReqType = uint8(con[SerialHeaderSize])
 
 			out <- req
 		}
@@ -75,12 +75,12 @@ func (c Connection) HandleChannels() {
 	// Goroutine for handling log messages
 	go func(in <-chan LogMessage, out chan<- []byte) {
 		for con := range in {
-			buf := make([]byte, SerialHeaderSize+len(con.msg))
+			buf := make([]byte, SerialHeaderSize+len(con.Msg))
 			buf[0] = byte(0xB5)
 			buf[1] = byte(0x62)
 			buf[2] = byte(LogMsg)
 			buf[3] = byte(len(buf))
-			msgBytes := []byte(con.msg)
+			msgBytes := []byte(con.Msg)
 			copy(buf[4:], msgBytes) //This might need to be 3 not 4
 
 			out <- buf
@@ -95,7 +95,7 @@ func (c Connection) HandleChannels() {
 			buf[1] = byte(0x62)
 			buf[2] = byte(PowerReq)
 			buf[3] = byte(1)
-			accept := gohelpers.B2i(con.accept)
+			accept := gohelpers.B2i(con.Accept)
 			buf[4] = byte(accept)
 
 			out <- buf

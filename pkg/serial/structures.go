@@ -8,17 +8,17 @@ type Control struct {
 
 // PowerRequest is the structure for ESP -> Pi power requests
 type PowerRequest struct {
-	reqType uint8
+	ReqType uint8
 }
 
 // PowerReqResponse is the structure for the Pi's reponse to power requests
 type PowerReqResponse struct {
-	accept bool
+	Accept bool
 }
 
 // LogMessage contains a log message for ESP to log to webserver
 type LogMessage struct {
-	msg string
+	Msg string
 }
 
 // Serial info configs, we can put this in a pkg later to make neat
