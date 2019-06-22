@@ -2,27 +2,38 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gocv.io/x/gocv"
 
-	"github.com/alistair-english/DRC2019/internal/pkg/camera"
+	"github.com/alistair-english/DRC2019/pkg/camera"
+	"github.com/alistair-english/DRC2019/pkg/config"
+	"github.com/alistair-english/DRC2019/pkg/serial"
 )
 
-func processImg(img gocv.Mat, motionCtrlChan chan<- bool) {
+func processImg(img gocv.Mat, motionCtrlChan chan<- serial.Control) {
 	// This is where the image gets processed and then we send a move control struct to the serial.
 	fmt.Println(img.GetIntAt3(500, 500, 4))
-	motionCtrlChan <- true
+	motionCtrlChan <- serial.Control{0, 50}
 }
 
 func main() {
-	// Setup
+	// Camera Setup
 	camImg := gocv.NewMat()
 	defer camImg.Close()
 
 	cam := camera.FakeCamera{}
 	camConn := camera.NewConnection(cam, &camImg)
 
-	serialChan := make(chan bool, 100)
+	// Serial Setup
+	serialConfig := config.GetSerialConfig()
+
+	ser := serial.NewPiSerial(
+		serialConfig.Port,
+		serialConfig.Baud,
+		time.Duration(serialConfig.TimeoutMs)*time.Millisecond,
+	)
+	serConn, _ := serial.NewConnection(ser)
 
 	displayWindow := gocv.NewWindow("Display")
 	defer displayWindow.Close()
@@ -37,13 +48,10 @@ func main() {
 			displayWindow.WaitKey(1)
 
 			// Spawn a go routine to do the heavy processing and then talk to serial when its done
-			go processImg(camImg, serialChan)
+			go processImg(camImg, serConn.ControlChan)
 
 			// Then request another image
 			camConn.RequestImage()
-		case <-serialChan:
-			// Processing done (wouldn't actually have this here)
-			fmt.Println("Processing done")
 		}
 	}
 }

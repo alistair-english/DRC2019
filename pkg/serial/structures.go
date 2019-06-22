@@ -2,8 +2,8 @@ package serial
 
 // Control contains dir and spd
 type Control struct {
-	dir int8 // Direction = -90 -> 90
-	spd int8 // Speed = -100 -> 100
+	Dir int8 // Direction = -90 -> 90
+	Spd int8 // Speed = -100 -> 100
 }
 
 // PowerReq is the structure for ESP -> Pi power requests

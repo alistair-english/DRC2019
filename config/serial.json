@@ -1,0 +1,5 @@
+{
+    "port": "/dev/tty.usbserial",
+    "baud": 115200,
+    "timeoutMs": 10
+}
