@@ -130,16 +130,9 @@ func main() {
 			log.Println(v) // Filler to get rid of errors
 		}
 	}(readChan)
-}
 
-func decodeHeaderPacket(arr []byte) SerialHeader {
-	var packet SerialHeader
-
-	// Decode a packet header into the SerialHeader datatype
-	packet.Sync1 = arr[0]
-	packet.Sync2 = arr[1]
-	packet.Type = arr[2]
-	packet.Size = arr[3]
-
-	return packet
+	// Debug testing of writeChannel
+	for {
+		writeChan <- []byte{0x01}
+	}
 }
