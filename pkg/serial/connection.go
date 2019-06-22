@@ -29,7 +29,8 @@ func NewConnection(serial Implementation) (*Connection, error) {
 
 	c := Connection{controlChan, powerReqChan, logMSgChan, powerReqResponse, writeChan, readChan, serial}
 
-	go c.HandleChannels()
+	c.Init()
+	c.HandleChannels()
 
 	return &c, nil
 }
