@@ -14,20 +14,21 @@ import (
 func processImg(img gocv.Mat, motionCtrlChan chan<- serial.Control) {
 	// This is where the image gets processed and then we send a move control struct to the serial.
 	fmt.Println(img.GetIntAt3(500, 500, 4))
-	motionCtrlChan <- serial.Control{0, 50}
+	motionCtrlChan <- serial.Control{
+		Dir: 0,
+		Spd: 50,
+	}
 }
 
 func main() {
 	// Camera Setup
 	camImg := gocv.NewMat()
 	defer camImg.Close()
-
 	cam := camera.FakeCamera{}
 	camConn := camera.NewConnection(cam, &camImg)
 
 	// Serial Setup
 	serialConfig := config.GetSerialConfig()
-
 	ser := serial.NewPiSerial(
 		serialConfig.Port,
 		serialConfig.Baud,
@@ -52,6 +53,10 @@ func main() {
 
 			// Then request another image
 			camConn.RequestImage()
+		case pwrReq := <-serConn.PowerReqChan:
+			if pwrReq.ReqType == serial.ForceStop {
+				fmt.Println("shut down!")
+			}
 		}
 	}
 }
