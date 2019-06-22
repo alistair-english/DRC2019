@@ -2,32 +2,43 @@ package serial
 
 import (
 	"errors"
-	"github.com/tarm/serial"
 	t "time"
+
+	"github.com/tarm/serial"
 )
 
 //Implementation is the interface for serial
 type Implementation interface {
 	Init() error
-	RunSerialTx(writeChan <-chan []byte)
-	RunSerialRx(readChan chan<- []byte)
+	RunSerialTx(writeChan <-chan []byte) error
+	RunSerialRx(readChan chan<- []byte) error
 }
 
 // PiSerial is the serial implementation
 type PiSerial struct {
-	port       string
-	baud       int
-	timeoutMs  t.Duration
+	Port       string
+	Baud       int
+	Timeout    t.Duration
 	connection *serial.Port
+}
+
+// NewPiSerial creates a new PiSerial object
+func NewPiSerial(port string, baud int, timeout t.Duration) *PiSerial {
+	return &PiSerial{
+		port,
+		baud,
+		timeout,
+		nil,
+	}
 }
 
 // Init begins some serial stuff
 func (s PiSerial) Init() error {
 	// Setup serial options
 	options := serial.Config{
-		Name:        s.port,      // Just a testing serial port
-		Baud:        s.baud,      // Probs the wrong baud rate
-		ReadTimeout: s.timeoutMs, // Filler Value
+		Name:        s.Port,
+		Baud:        s.Baud,
+		ReadTimeout: s.Timeout,
 		Size:        8,
 		StopBits:    1,
 		Parity:      'N',

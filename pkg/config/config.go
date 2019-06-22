@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	PINS_CONF_FILE = "/src/github.com/alistair-english/DRC2019/config/pins.json"
-	CV_CONF_FILE   = "/src/github.com/alistair-english/DRC2019/config/cv.json"
-	CAM_CONF_FILE  = "/src/github.com/alistair-english/DRC2019/config/cam.json"
+	PINS_CONF_FILE   = "/src/github.com/alistair-english/DRC2019/config/pins.json"
+	CV_CONF_FILE     = "/src/github.com/alistair-english/DRC2019/config/cv.json"
+	SERIAL_CONF_FILE = "/src/github.com/alistair-english/DRC2019/config/serial.json"
 )
 
 // PinConfig is the datatype for control pin information
@@ -33,9 +33,11 @@ type CVConfig struct {
 	RightUpper HSV `json:"rightUpper"`
 }
 
-// CAMConfig is the datatype for the CAM information
-type CAMConfig struct {
-	Port string `json:"port"`
+// SerialConfig is the datatype for the Serial information
+type SerialConfig struct {
+	Port      string `json:"port"`
+	Baud      int    `json:"baud"`
+	TimeoutMs int    `json:"timeoutMs"`
 }
 
 // GetPinConfig gets the pin configuration information from a json file
@@ -64,15 +66,15 @@ func GetCVConfig() CVConfig {
 	return cv
 }
 
-// GetCameraConfig gets the camera configuration information from a json file
-func GetCameraConfig() CAMConfig {
-	var ccf CAMConfig
-	camConfigFile, err := os.Open(os.Getenv("GOPATH") + CAM_CONF_FILE)
-	defer camConfigFile.Close()
+// GetSerialConfig gets the camera configuration information from a json file
+func GetSerialConfig() SerialConfig {
+	var scf SerialConfig
+	serialConfigFile, err := os.Open(os.Getenv("GOPATH") + SERIAL_CONF_FILE)
+	defer serialConfigFile.Close()
 	if err != nil {
 		panic(err)
 	}
-	jsonParser := json.NewDecoder(camConfigFile)
-	jsonParser.Decode(&ccf)
-	return ccf
+	jsonParser := json.NewDecoder(serialConfigFile)
+	jsonParser.Decode(&scf)
+	return scf
 }

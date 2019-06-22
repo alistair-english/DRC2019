@@ -7,8 +7,8 @@ import (
 
 	"gocv.io/x/gocv"
 
-	"github.com/alistair-english/DRC2019/internal/pkg/config"
-	"github.com/alistair-english/DRC2019/internal/pkg/cvhelpers"
+	"github.com/alistair-english/DRC2019/pkg/config"
+	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
 )
 
 func b2i(b bool) int {

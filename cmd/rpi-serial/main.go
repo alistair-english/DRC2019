@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/alistair-english/DRC2019/internal/pkg/config"
-	"github.com/tarm/serial"
 	"log"
 	"os"
 	t "time"
+
+	"github.com/alistair-english/DRC2019/pkg/config"
+	"github.com/tarm/serial"
 )
 
 // Serial info configs, we can put this in a pkg later to make neat
