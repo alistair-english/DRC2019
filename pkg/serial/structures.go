@@ -8,7 +8,7 @@ type Control struct {
 
 // PowerRequest is the structure for ESP -> Pi power requests
 type PowerRequest struct {
-	ReqType uint8
+	ReqType MsgType
 }
 
 // PowerReqResponse is the structure for the Pi's reponse to power requests
@@ -29,7 +29,7 @@ const (
 )
 
 // MsgType contains all serial message types
-type MsgType int
+type MsgType uint8
 
 // Regular Msg
 const (

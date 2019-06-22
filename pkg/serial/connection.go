@@ -66,7 +66,7 @@ func (c Connection) HandleChannels() {
 	go func(in <-chan []byte, out chan<- PowerRequest) {
 		for con := range in {
 			var req PowerRequest
-			req.ReqType = uint8(con[SerialHeaderSize])
+			req.ReqType = MsgType(con[SerialHeaderSize])
 
 			out <- req
 		}
@@ -79,7 +79,7 @@ func (c Connection) HandleChannels() {
 			buf[0] = byte(0xB5)
 			buf[1] = byte(0x62)
 			buf[2] = byte(LogMsg)
-			buf[3] = byte(len(buf))
+			buf[3] = byte(len(con.Msg))
 			msgBytes := []byte(con.Msg)
 			copy(buf[4:], msgBytes) //This might need to be 3 not 4
 
