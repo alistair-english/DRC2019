@@ -93,16 +93,14 @@ func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- 
 		copy(byteImg, cam.currImg)
 		cam.rwMutex.Unlock()
 
-		if len(byteImg) > 0 {
-			img, err := gocv.IMDecode(byteImg, gocv.IMReadUnchanged)
-			if err != nil {
-				// probably should log but just go again
-				continue
-			}
-			img.CopyTo(outputImg)
-			imageResult <- true
-			img.Close()
+		img, err := gocv.IMDecode(byteImg, gocv.IMReadUnchanged)
+		if err != nil {
+			// probably should log but just go again
+			continue
 		}
+		img.CopyTo(outputImg)
+		imageResult <- true
+		img.Close()
 
 	}
 }
