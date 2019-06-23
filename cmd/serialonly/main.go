@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/config"
@@ -10,12 +11,19 @@ import (
 func main() {
 	// Serial Setup
 	serialConfig := config.GetSerialConfig()
-	ser := serial.NewPiSerial(
+	ser, err := serial.NewPiSerial(
 		serialConfig.Port,
 		serialConfig.Baud,
 		time.Duration(serialConfig.TimeoutMs)*time.Millisecond,
 	)
-	serConn, _ := serial.NewConnection(ser)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	serConn, err := serial.NewConnection(ser)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	for {
 		serConn.ControlChan <- serial.Control{

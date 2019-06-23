@@ -29,21 +29,12 @@ func NewConnection(serial Implementation) (*Connection, error) {
 
 	c := Connection{controlChan, powerReqChan, logMSgChan, powerReqResponse, writeChan, readChan, serial}
 
-	c.Init()
+	go c.serial.RunSerialTx(c.writeChan)
+	go c.serial.RunSerialRx(c.readChan)
+
 	c.HandleChannels()
 
 	return &c, nil
-}
-
-// Init inits all the serial things
-func (c Connection) Init() error {
-	err := c.serial.Init()
-	if err != nil {
-		return err
-	}
-	go c.serial.RunSerialTx(c.writeChan)
-	go c.serial.RunSerialRx(c.readChan)
-	return nil
 }
 
 // HandleChannels handles channels
