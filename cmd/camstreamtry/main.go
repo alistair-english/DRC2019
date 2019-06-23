@@ -50,7 +50,7 @@ func main() {
 			foundStart := false
 
 			// check if we found the start of an image
-			for i := 0; i < n; i++ {
+			for i := 0; i <= (n - len(jpgStart)); i++ {
 				if bytes.Compare(readBuff[i:i+len(jpgStart)], jpgStart) == 0 {
 					// we found a new image start point at i
 					foundStart = true
