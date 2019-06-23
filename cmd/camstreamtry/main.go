@@ -12,8 +12,8 @@ import (
 var jpgStart = []byte{0xFF, 0xD8, 0xFF}
 
 func main() {
-	displayWindow := gocv.NewWindow("Display")
-	defer displayWindow.Close()
+	// displayWindow := gocv.NewWindow("Display")
+	// defer displayWindow.Close()
 
 	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
 
@@ -43,9 +43,9 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println(n)
-			fmt.Println(len(readBuff))
-			fmt.Println(readBuff[0:30])
+			// fmt.Println(n)
+			// fmt.Println(len(readBuff))
+			// fmt.Println(readBuff[0:30])
 
 			foundStart := false
 
@@ -88,10 +88,12 @@ func main() {
 				fmt.Println(err)
 			}
 
-			displayWindow.IMShow(img)
-			displayWindow.WaitKey(1)
-			fmt.Println(len(currImg))
-			fmt.Println(img.Size())
+			fmt.Println(img.GetIntAt3(img.Cols()/2, img.Rows()/2, 0))
+
+			// displayWindow.IMShow(img)
+			// displayWindow.WaitKey(1)
+			// fmt.Println(len(currImg))
+			// fmt.Println(img.Size())
 			img.Close()
 		}
 	}
