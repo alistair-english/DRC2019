@@ -36,7 +36,9 @@ func main() {
 
 	var currImg []byte
 
-	go func() {
+	channel := make(chan bool, 1)
+
+	go func(channel chan<- bool) {
 		for {
 
 			n, err := stdOut.Read(readBuff)
@@ -66,6 +68,10 @@ func main() {
 						copy(cpyImg, imgBuff.Bytes())
 						currImg = cpyImg
 
+						select {
+						case channel <- true:
+						}
+
 						// reset the buffer
 						imgBuff.Reset()
 					}
@@ -79,9 +85,9 @@ func main() {
 				imgBuff.Write(readBuff)
 			}
 		}
-	}()
+	}(channel)
 
-	for {
+	for range channel {
 		if len(currImg) > 0 {
 			img, err := gocv.IMDecode(currImg, gocv.IMReadUnchanged)
 			if err != nil {
