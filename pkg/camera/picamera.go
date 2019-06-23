@@ -101,6 +101,9 @@ func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- 
 			img.CopyTo(outputImg)
 			imageResult <- true
 			img.Close()
+		} else {
+			fmt.Println(len(byteImg))
+			fmt.Println(err)
 		}
 		fmt.Println("decode done")
 
