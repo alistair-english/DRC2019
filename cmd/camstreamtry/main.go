@@ -10,7 +10,7 @@ func main() {
 	//displayWindow := gocv.NewWindow("Display")
 	//defer displayWindow.Close()
 
-	cmd := exec.Command("raspivid", "-t", "0", "-o", "-")
+	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
