@@ -94,7 +94,7 @@ func main() {
 				fmt.Println(err)
 			}
 
-			fmt.Println(img.GetIntAt3(img.Cols()/2, img.Rows()/2, 0))
+			fmt.Println(img.GetVecfAt(img.Cols()/2, img.Rows()/2))
 
 			// displayWindow.IMShow(img)
 			// displayWindow.WaitKey(1)
