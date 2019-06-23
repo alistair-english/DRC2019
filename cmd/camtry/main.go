@@ -18,6 +18,7 @@ func main() {
 			return
 		}
 		fmt.Println(len(data))
+		fmt.Println(data[0:30])
 
 		img,err := gocv.IMDecode(data, gocv.IMReadUnchanged)
 	        if err != nil {
