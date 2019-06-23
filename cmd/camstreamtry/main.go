@@ -11,13 +11,14 @@ func main() {
 	//defer displayWindow.Close()
 
 	cmd := exec.Command("raspivid", "-t", "0", "-o", "-")
-	err := cmd.Start()
+
+	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	stdOut, err := cmd.StdoutPipe()
+	err = cmd.Start()
 	if err != nil {
 		fmt.Println(err)
 		return
