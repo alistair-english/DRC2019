@@ -52,8 +52,10 @@ func main() {
 		select {
 		case <-camConn.ImageResult:
 			// Img is ready to be processed
-			displayWindow.IMShow(camImg)
-			displayWindow.WaitKey(1)
+			if camImg.Rows() == 0 || camImg.Cols() == 0 {
+				displayWindow.IMShow(camImg)
+				displayWindow.WaitKey(1)
+			}
 
 			// Spawn a go routine to do the heavy processing and then talk to serial when its done
 			go processImg(camImg, serConn.ControlChan)
