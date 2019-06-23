@@ -76,15 +76,17 @@ func main() {
 	}()
 
 	for {
-		img, err := gocv.IMDecode(currImg, gocv.IMReadUnchanged)
-		if err != nil {
-			fmt.Println(err)
-		}
+		if len(currImg) > 0 {
+			img, err := gocv.IMDecode(currImg, gocv.IMReadUnchanged)
+			if err != nil {
+				fmt.Println(err)
+			}
 
-		displayWindow.IMShow(img)
-		displayWindow.WaitKey(1)
-		fmt.Println(len(currImg))
-		fmt.Println(img.Size())
-		img.Close()
+			displayWindow.IMShow(img)
+			displayWindow.WaitKey(1)
+			fmt.Println(len(currImg))
+			fmt.Println(img.Size())
+			img.Close()
+		}
 	}
 }
