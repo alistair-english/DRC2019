@@ -2,6 +2,7 @@ package camera
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"sync"
 
@@ -88,10 +89,12 @@ func NewPiCamera() (*PiCamera, error) {
 // RunImagePoller from the camera Implementation
 func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
 	for range imageRequest {
+		fmt.Println("img reqest")
 		cam.rwMutex.Lock()
 		byteImg := make([]byte, len(cam.currImg))
 		copy(byteImg, cam.currImg)
 		cam.rwMutex.Unlock()
+		fmt.Println("lock unlock")
 
 		img, err := gocv.IMDecode(byteImg, gocv.IMReadUnchanged)
 		if err == nil {
@@ -99,8 +102,9 @@ func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- 
 			imageResult <- true
 			img.Close()
 		}
+		fmt.Println("decode done")
 
 		imageResult <- true
-
+		fmt.Println("token done")
 	}
 }
