@@ -2,6 +2,7 @@ package camera
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"sync"
 
@@ -46,6 +47,8 @@ func NewPiCamera() (*PiCamera, error) {
 				continue
 			}
 
+			fmt.Println(readBuff[0:10])
+
 			foundStart := false
 
 			// check if we found the start of an image
@@ -63,9 +66,11 @@ func NewPiCamera() (*PiCamera, error) {
 						// Copy the completed image out of the buffer and into the current img
 						cpyImg := make([]byte, imgBuff.Len())
 						copy(cpyImg, imgBuff.Bytes())
+						fmt.Println("stream lock")
 						piCam.rwMutex.Lock()
 						piCam.currImg = cpyImg
 						piCam.rwMutex.Unlock()
+						fmt.Println("stream unlock")
 
 						// reset the buffer
 						imgBuff.Reset()
@@ -88,10 +93,13 @@ func NewPiCamera() (*PiCamera, error) {
 // RunImagePoller from the camera Implementation
 func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
 	for range imageRequest {
+		fmt.Println("image requested!")
 		cam.rwMutex.Lock()
 		byteImg := make([]byte, len(cam.currImg))
 		copy(byteImg, cam.currImg)
 		cam.rwMutex.Unlock()
+
+		fmt.Println("locked and unlocked")
 
 		if len(byteImg) > 0 {
 			img, err := gocv.IMDecode(byteImg, gocv.IMReadUnchanged)
