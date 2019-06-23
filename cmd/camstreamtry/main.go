@@ -47,10 +47,13 @@ func main() {
 			fmt.Println(len(readBuff))
 			fmt.Println(readBuff[0:30])
 
+			foundStart := false
+
+			// check if we found the start of an image
 			for i := 0; i < n; i++ {
-				// check if we found the start of an image
 				if bytes.Compare(readBuff[i:i+len(jpgStart)], jpgStart) == 0 {
 					// we found a new image start point at i
+					foundStart = true
 
 					// write the rest of the old image into the currImg buffer
 					imgBuff.Write(readBuff[0:i])
@@ -68,9 +71,12 @@ func main() {
 					}
 
 					imgBuff.Write(readBuff[i:])
-				} else {
-					imgBuff.Write(readBuff)
+					break
 				}
+			}
+
+			if !foundStart {
+				imgBuff.Write(readBuff)
 			}
 		}
 	}()
