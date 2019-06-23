@@ -52,7 +52,7 @@ func main() {
 		select {
 		case <-camConn.ImageResult:
 			// Img is ready to be processed
-			if camImg.Rows() == 0 || camImg.Cols() == 0 {
+			if camImg.Rows() > 0 || camImg.Cols() > 0 {
 				displayWindow.IMShow(camImg)
 				displayWindow.WaitKey(1)
 			}
