@@ -23,6 +23,7 @@ func NewConnection(camera Implementation, outputImg *gocv.Mat) *Connection {
 
 func (conn Connection) init() {
 	// Set our image poller running with our channels
+	conn.camera.Init()
 	go conn.camera.RunImagePoller(conn.ImageRequest, conn.ImageResult, conn.outputImg)
 }
 
