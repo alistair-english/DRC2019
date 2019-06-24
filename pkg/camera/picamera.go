@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
-	"sync"
 
 	"gocv.io/x/gocv"
 )
@@ -13,8 +12,8 @@ var jpgStart = []byte{0xFF, 0xD8, 0xFF}
 
 // PiCamera is a camera implementation that connects to the Pi Camera
 type PiCamera struct {
-	rwMutex *sync.RWMutex
-	currImg []byte
+	syncChan chan bool
+	currImg  []byte
 }
 
 // NewPiCamera creates a new Pi Camera object
@@ -32,8 +31,10 @@ func NewPiCamera() (*PiCamera, error) {
 	readBuff := make([]byte, 4096) // read in stream 4 kilobyte chunks
 	imgBuff := new(bytes.Buffer)
 
+	syncChan := make(chan bool, 1)
+
 	var currImg []byte
-	piCam := PiCamera{new(sync.RWMutex), currImg}
+	piCam := PiCamera{syncChan, currImg}
 
 	go func() {
 		for {
@@ -76,6 +77,10 @@ func NewPiCamera() (*PiCamera, error) {
 						fmt.Println("len picam: ", len(piCam.currImg))
 						fmt.Println()
 
+						select {
+						case syncChan <- true:
+						}
+
 						// reset the buffer
 						imgBuff.Reset()
 					}
@@ -101,9 +106,7 @@ func NewPiCamera() (*PiCamera, error) {
 // RunImagePoller from the camera Implementation
 func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
 	for range imageRequest {
-		// for len(cam.currImg) < 1 {
-		// 	// fmt.Println("waiting for big img")
-		// }
+		<-cam.syncChan
 
 		img, err := gocv.IMDecode(cam.currImg, gocv.IMReadUnchanged)
 		if err == nil {
