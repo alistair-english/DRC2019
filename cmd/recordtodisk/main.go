@@ -14,12 +14,15 @@ func main() {
 	camImg := gocv.NewMat()
 	defer camImg.Close()
 
-	// TESTING SETUP
-	cam := &camera.WebCamera{}
+	cam, err := camera.NewPiCamera()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	camConn := camera.NewConnection(cam, &camImg)
 
-	displayWindow := gocv.NewWindow("Display")
-	defer displayWindow.Close()
+	// displayWindow := gocv.NewWindow("Display")
+	// defer displayWindow.Close()
 
 	camConn.RequestImage()
 
@@ -33,13 +36,14 @@ func main() {
 		select {
 		case <-camConn.ImageResult:
 			// Img is ready to be processed
-			if camImg.Rows() > 0 || camImg.Cols() > 0 {
-				displayWindow.IMShow(camImg)
-				displayWindow.WaitKey(1)
-			}
+			// if camImg.Rows() > 0 || camImg.Cols() > 0 {
+			// 	displayWindow.IMShow(camImg)
+			// 	displayWindow.WaitKey(1)
+			// }
 
 			// Write the img to disk
 			out.Write(camImg)
+			fmt.Println("frame written")
 
 			// Then request another image
 			camConn.RequestImage()
