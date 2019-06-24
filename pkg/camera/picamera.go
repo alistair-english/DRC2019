@@ -77,6 +77,8 @@ func NewPiCamera() (*PiCamera, error) {
 						imgBuff.Reset()
 					}
 
+					fmt.Println("tik")
+
 					imgBuff.Write(readBuff[i:])
 					break
 				}
