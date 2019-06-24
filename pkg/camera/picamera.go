@@ -101,9 +101,9 @@ func NewPiCamera() (*PiCamera, error) {
 // RunImagePoller from the camera Implementation
 func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
 	for range imageRequest {
-		for len(cam.currImg) < 1 {
-			// fmt.Println("waiting for big img")
-		}
+		// for len(cam.currImg) < 1 {
+		// 	// fmt.Println("waiting for big img")
+		// }
 
 		img, err := gocv.IMDecode(cam.currImg, gocv.IMReadUnchanged)
 		if err == nil {
