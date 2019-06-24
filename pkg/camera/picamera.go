@@ -32,20 +32,19 @@ func NewPiCamera() (*PiCamera, error) {
 	readBuff := make([]byte, 4096) // read in stream 4 kilobyte chunks
 	imgBuff := new(bytes.Buffer)
 
-	readyChan := make(chan bool, 1)
-
 	var currImg []byte
-
 	piCam := PiCamera{new(sync.RWMutex), currImg}
 
-	go func(readyChan chan bool) {
+	go func() {
 		for {
-
 			n, err := stdOut.Read(readBuff)
 			if err != nil {
 				// Should probably log here but for now just retry reading
 				continue
 			}
+
+			fmt.Println(n)
+			fmt.Println(readBuff[:30])
 
 			foundStart := false
 
@@ -64,9 +63,7 @@ func NewPiCamera() (*PiCamera, error) {
 						// Copy the completed image out of the buffer and into the current img
 						cpyImg := make([]byte, imgBuff.Len())
 						copy(cpyImg, imgBuff.Bytes())
-						piCam.rwMutex.Lock()
 						piCam.currImg = cpyImg
-						piCam.rwMutex.Unlock()
 
 						// reset the buffer
 						imgBuff.Reset()
@@ -77,11 +74,13 @@ func NewPiCamera() (*PiCamera, error) {
 				}
 			}
 
+			fmt.Println(foundStart)
+
 			if !foundStart {
 				imgBuff.Write(readBuff)
 			}
 		}
-	}(readyChan)
+	}()
 
 	return &piCam, nil
 }
@@ -90,20 +89,15 @@ func NewPiCamera() (*PiCamera, error) {
 func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
 	for range imageRequest {
 		for len(cam.currImg) < 1 {
+			// fmt.Println("waiting for big img")
 		}
 
-		cam.rwMutex.Lock()
-		byteImg := make([]byte, len(cam.currImg))
-		copy(byteImg, cam.currImg)
-		cam.rwMutex.Unlock()
-
-		img, err := gocv.IMDecode(byteImg, gocv.IMReadUnchanged)
+		img, err := gocv.IMDecode(cam.currImg, gocv.IMReadUnchanged)
 		if err == nil {
 			img.CopyTo(outputImg)
-			imageResult <- true
 			img.Close()
 		} else {
-			fmt.Println(len(byteImg))
+			fmt.Println(len(cam.currImg))
 			fmt.Println(err)
 		}
 		fmt.Println("decode done")

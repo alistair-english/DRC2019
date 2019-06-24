@@ -12,10 +12,11 @@ import (
 )
 
 func processImg(img gocv.Mat, motionCtrlChan chan<- serial.Control) {
-	if img.Rows() == 0 || img.Cols() == 0 {
+	// This is where the image gets processed and then we send a move control struct to the serial.
+	if img.Rows() < 1 || img.Cols() < 1 {
+		fmt.Println("processing 0 image")
 		return
 	}
-	// This is where the image gets processed and then we send a move control struct to the serial.
 	fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
 	motionCtrlChan <- serial.Control{
 		Dir: 0,
