@@ -50,7 +50,7 @@ func (s PiSerial) RunSerialTx(writeChan <-chan []byte) error {
 			return err
 		}
 		// Debug Delay yeet delet this when actually doing stuff
-		t.Sleep(1000 * t.Millisecond)
+		//t.Sleep(1000 * t.Millisecond)
 	}
 	return nil
 }

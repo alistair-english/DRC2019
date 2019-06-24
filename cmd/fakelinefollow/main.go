@@ -1,28 +1,15 @@
 package main
 
 import (
-	"fmt"
+	//	"fmt"
 	"time"
 
-	"gocv.io/x/gocv"
+	//"gocv.io/x/gocv"
 
 	//"github.com/alistair-english/DRC2019/pkg/camera"
 	"github.com/alistair-english/DRC2019/pkg/config"
 	"github.com/alistair-english/DRC2019/pkg/serial"
 )
-
-func processImg(img gocv.Mat, motionCtrlChan chan<- serial.Control) {
-	if img.Rows() == 0 || img.Cols() == 0 {
-		return
-	}
-	// This is where the image gets processed and then we send a move control struct to the serial.
-	fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
-	motionCtrlChan <- serial.Control{
-		Dir: 0,
-		Spd: 50,
-	}
-}
-
 func main() {
 	// Camera Setup
 	// camImg := gocv.NewMat()
@@ -44,25 +31,27 @@ func main() {
 	serConn, _ := serial.NewConnection(ser)
 	serConn.ControlChan <- serial.Control{
 		Dir: 0,
-		Spd: 50,
+		Spd: 100,
 	}
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Millisecond * 2000)
 	serConn.ControlChan <- serial.Control{
-		Dir: 90,
-		Spd: 50,
+		Dir: -40,
+		Spd: 100,
 	}
 	time.Sleep(time.Millisecond * 500)
 	for i := 0; i < 10; i++ {
 		serConn.ControlChan <- serial.Control{
-			Dir: int8(90 - 9*i),
-			Spd: 50,
+			Dir: int8(-50 + 5*i),
+			Spd: 100,
 		}
-		time.Sleep(time.Millisecond * 300)
+		time.Sleep(time.Millisecond * 100)
 	}
+	time.Sleep(time.Millisecond * 1000)
 	serConn.ControlChan <- serial.Control{
 		Dir: 0,
-		Spd: 50,
+		Spd: 0,
 	}
+	time.Sleep(time.Millisecond * 100)
 
 	// displayWindow := gocv.NewWindow("Display")
 	// defer displayWindow.Close()
