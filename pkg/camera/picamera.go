@@ -83,6 +83,9 @@ func (cam PiCamera) CameraConnectionTask() {
 					cam.currImg = cpyImg
 					fmt.Println("len cpyImg: ", len(cpyImg))
 					fmt.Println("len picam: ", len(cam.currImg))
+					fmt.Println("cpyImg: ", cpyImg[:15])
+					fmt.Println("picam: ", cam.currImg[:15])
+					fmt.Print("bytes: ", imgBuff.Bytes()[:15])
 					fmt.Println()
 
 					select {
