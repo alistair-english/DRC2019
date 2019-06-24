@@ -10,10 +10,15 @@ import (
 // Implementation represents the code that actually talks to a camera. Is designed to be able to be swapped out with another camera Implementation.
 type Implementation interface {
 	RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat)
+	Init()
 }
 
 // FakeCamera is a dummy camera that just returns the same image.
 type FakeCamera struct {
+}
+
+// Init from the camera Implementation
+func (cam FakeCamera) Init() {
 }
 
 // RunImagePoller from the camera Implementation

@@ -35,9 +35,12 @@ func NewPiCamera() (*PiCamera, error) {
 	var currImg []byte
 	piCam := PiCamera{syncChan, currImg, stdOut}
 
-	go piCam.CameraConnectionTask()
-
 	return &piCam, nil
+}
+
+// Init from the camera Implementation
+func (cam PiCamera) Init() {
+	go cam.CameraConnectionTask()
 }
 
 // CameraConnectionTask is the task that talks to the rpi camera std out
