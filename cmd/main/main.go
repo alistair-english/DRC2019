@@ -44,7 +44,7 @@ func main() {
 	// serConn, _ := serial.NewConnection(ser)
 
 	// TESTING SETUP
-	cam := &camera.WebCamera{}
+	cam := camera.NewFileReaderCamera("/home/alistair/Dev/go/src/github.com/alistair-english/DRC2019/cmd/recordtodisk/recording_06-24-2019_45:23:45.avi")
 	camConn := camera.NewConnection(cam, &camImg)
 
 	// Serial Setup
