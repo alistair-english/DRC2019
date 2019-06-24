@@ -12,10 +12,10 @@ import (
 var jpgStart = []byte{0xFF, 0xD8, 0xFF}
 
 func main() {
-	// displayWindow := gocv.NewWindow("Display")
-	// defer displayWindow.Close()
+	displayWindow := gocv.NewWindow("Display")
+	defer displayWindow.Close()
 
-	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
+	cmd := exec.Command("raspivid", "-rf", "rgb", "-t", "0", "-o", "-")
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
@@ -96,10 +96,10 @@ func main() {
 
 			fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
 
-			// displayWindow.IMShow(img)
-			// displayWindow.WaitKey(1)
-			// fmt.Println(len(currImg))
-			// fmt.Println(img.Size())
+			displayWindow.IMShow(img)
+			displayWindow.WaitKey(1)
+			fmt.Println(len(currImg))
+			fmt.Println(img.Size())
 			img.Close()
 		}
 	}
