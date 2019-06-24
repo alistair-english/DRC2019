@@ -2,6 +2,7 @@ package serial
 
 import (
 	"errors"
+	"fmt"
 	t "time"
 
 	"github.com/tarm/serial"
@@ -11,6 +12,24 @@ import (
 type Implementation interface {
 	RunSerialTx(writeChan <-chan []byte) error
 	RunSerialRx(readChan chan<- []byte) error
+}
+
+// FakeSerial is a fake testing serial implementation
+type FakeSerial struct {
+}
+
+// RunSerialTx prints to console
+func (s FakeSerial) RunSerialTx(writeChan <-chan []byte) error {
+	// Iterate over the channel looking for new stuff to shoot out over serial
+	for v := range writeChan {
+		fmt.Println("Serial Write: ", v)
+	}
+	return nil
+}
+
+// RunSerialRx is empty (no need to send anything)
+func (s FakeSerial) RunSerialRx(readChan chan<- []byte) error {
+	return nil
 }
 
 // PiSerial is the serial implementation
