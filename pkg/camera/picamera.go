@@ -44,6 +44,7 @@ func NewPiCamera() (*PiCamera, error) {
 			}
 
 			fmt.Println(n)
+			fmt.Println(readBuff[:30])
 
 			foundStart := false
 
