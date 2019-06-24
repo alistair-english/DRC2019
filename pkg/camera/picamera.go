@@ -3,6 +3,7 @@ package camera
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
 
 	"gocv.io/x/gocv"
@@ -14,6 +15,7 @@ var jpgStart = []byte{0xFF, 0xD8, 0xFF}
 type PiCamera struct {
 	syncChan chan bool
 	currImg  []byte
+	stdOut   io.ReadCloser
 }
 
 // NewPiCamera creates a new Pi Camera object
@@ -28,79 +30,82 @@ func NewPiCamera() (*PiCamera, error) {
 		return nil, err
 	}
 
-	readBuff := make([]byte, 4096) // read in stream 4 kilobyte chunks
-	imgBuff := new(bytes.Buffer)
-
 	syncChan := make(chan bool, 1)
 
 	var currImg []byte
-	piCam := PiCamera{syncChan, currImg}
+	piCam := PiCamera{syncChan, currImg, stdOut}
 
-	go func() {
-		for {
-			n, err := stdOut.Read(readBuff)
-			if err != nil {
-				// Should probably log here but for now just retry reading
-				continue
-			}
-
-			// fmt.Println(n)
-			// fmt.Println(readBuff[:30])
-
-			foundStart := false
-
-			// check if we found the start of an image
-			for i := 0; i <= (n - len(jpgStart)); i++ {
-				if bytes.Compare(readBuff[i:i+len(jpgStart)], jpgStart) == 0 {
-					// we found a new image start point at i
-					foundStart = true
-
-					fmt.Println("i: ", i)
-					fmt.Println("preimg buff len: ", imgBuff.Len())
-
-					// write the rest of the old image into the currImg buffer
-					imgBuff.Write(readBuff[0:i])
-
-					fmt.Println("img buff len: ", imgBuff.Len())
-
-					if imgBuff.Len() > 0 {
-						// the was already part of an img in here - img must be done
-
-						// Copy the completed image out of the buffer and into the current img
-						fmt.Println("pre make")
-						cpyImg := make([]byte, imgBuff.Len())
-						fmt.Println("pre copy")
-						copy(cpyImg, imgBuff.Bytes())
-						fmt.Println("post copy")
-						piCam.currImg = cpyImg
-						fmt.Println("len cpyImg: ", len(cpyImg))
-						fmt.Println("len picam: ", len(piCam.currImg))
-						fmt.Println()
-
-						select {
-						case syncChan <- true:
-						}
-
-						// reset the buffer
-						imgBuff.Reset()
-					}
-
-					fmt.Println("tik")
-
-					imgBuff.Write(readBuff[i:])
-					break
-				}
-			}
-
-			// fmt.Println(foundStart)
-
-			if !foundStart {
-				imgBuff.Write(readBuff)
-			}
-		}
-	}()
+	go piCam.CameraConnectionTask()
 
 	return &piCam, nil
+}
+
+// CameraConnectionTask is the task that talks to the rpi camera std out
+func (cam PiCamera) CameraConnectionTask() {
+	readBuff := make([]byte, 4096) // read in stream 4 kilobyte chunks
+	imgBuff := new(bytes.Buffer)
+
+	for {
+		n, err := cam.stdOut.Read(readBuff)
+		if err != nil {
+			// Should probably log here but for now just retry reading
+			continue
+		}
+
+		// fmt.Println(n)
+		// fmt.Println(readBuff[:30])
+
+		foundStart := false
+
+		// check if we found the start of an image
+		for i := 0; i <= (n - len(jpgStart)); i++ {
+			if bytes.Compare(readBuff[i:i+len(jpgStart)], jpgStart) == 0 {
+				// we found a new image start point at i
+				foundStart = true
+
+				fmt.Println("i: ", i)
+				fmt.Println("preimg buff len: ", imgBuff.Len())
+
+				// write the rest of the old image into the currImg buffer
+				imgBuff.Write(readBuff[0:i])
+
+				fmt.Println("img buff len: ", imgBuff.Len())
+
+				if imgBuff.Len() > 0 {
+					// the was already part of an img in here - img must be done
+
+					// Copy the completed image out of the buffer and into the current img
+					fmt.Println("pre make")
+					cpyImg := make([]byte, imgBuff.Len())
+					fmt.Println("pre copy")
+					copy(cpyImg, imgBuff.Bytes())
+					fmt.Println("post copy")
+					cam.currImg = cpyImg
+					fmt.Println("len cpyImg: ", len(cpyImg))
+					fmt.Println("len picam: ", len(cam.currImg))
+					fmt.Println()
+
+					select {
+					case cam.syncChan <- true:
+					}
+
+					// reset the buffer
+					imgBuff.Reset()
+				}
+
+				fmt.Println("tik")
+
+				imgBuff.Write(readBuff[i:])
+				break
+			}
+		}
+
+		// fmt.Println(foundStart)
+
+		if !foundStart {
+			imgBuff.Write(readBuff)
+		}
+	}
 }
 
 // RunImagePoller from the camera Implementation
