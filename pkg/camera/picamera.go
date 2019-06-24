@@ -64,9 +64,9 @@ func NewPiCamera() (*PiCamera, error) {
 						// Copy the completed image out of the buffer and into the current img
 						cpyImg := make([]byte, imgBuff.Len())
 						copy(cpyImg, imgBuff.Bytes())
-						piCam.rwMutex.Lock()
+						// piCam.rwMutex.Lock()
 						piCam.currImg = cpyImg
-						piCam.rwMutex.Unlock()
+						// piCam.rwMutex.Unlock()
 
 						// reset the buffer
 						imgBuff.Reset()
@@ -92,10 +92,10 @@ func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- 
 		for len(cam.currImg) < 1 {
 		}
 
-		cam.rwMutex.Lock()
+		// cam.rwMutex.Lock()
 		byteImg := make([]byte, len(cam.currImg))
 		copy(byteImg, cam.currImg)
-		cam.rwMutex.Unlock()
+		// cam.rwMutex.Unlock()
 
 		img, err := gocv.IMDecode(byteImg, gocv.IMReadUnchanged)
 		if err == nil {
