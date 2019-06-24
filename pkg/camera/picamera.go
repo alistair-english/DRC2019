@@ -66,8 +66,11 @@ func NewPiCamera() (*PiCamera, error) {
 						// the was already part of an img in here - img must be done
 
 						// Copy the completed image out of the buffer and into the current img
+						fmt.Println("pre make")
 						cpyImg := make([]byte, imgBuff.Len())
+						fmt.Println("pre copy")
 						copy(cpyImg, imgBuff.Bytes())
+						fmt.Println("post copy")
 						piCam.currImg = cpyImg
 						fmt.Println("len cpyImg: ", len(cpyImg))
 						fmt.Println("len picam: ", len(piCam.currImg))
