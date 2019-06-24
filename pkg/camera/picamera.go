@@ -43,8 +43,8 @@ func NewPiCamera() (*PiCamera, error) {
 				continue
 			}
 
-			fmt.Println(n)
-			fmt.Println(readBuff[:30])
+			// fmt.Println(n)
+			// fmt.Println(readBuff[:30])
 
 			foundStart := false
 
@@ -54,8 +54,13 @@ func NewPiCamera() (*PiCamera, error) {
 					// we found a new image start point at i
 					foundStart = true
 
+					fmt.Println(i)
+					fmt.Println(imgBuff.Len())
+
 					// write the rest of the old image into the currImg buffer
 					imgBuff.Write(readBuff[0:i])
+
+					fmt.Println(imgBuff.Len())
 
 					if imgBuff.Len() > 0 {
 						// the was already part of an img in here - img must be done
@@ -64,6 +69,8 @@ func NewPiCamera() (*PiCamera, error) {
 						cpyImg := make([]byte, imgBuff.Len())
 						copy(cpyImg, imgBuff.Bytes())
 						piCam.currImg = cpyImg
+						fmt.Println(len(cpyImg))
+						fmt.Println(len(piCam.currImg))
 
 						// reset the buffer
 						imgBuff.Reset()
@@ -74,7 +81,7 @@ func NewPiCamera() (*PiCamera, error) {
 				}
 			}
 
-			fmt.Println(foundStart)
+			// fmt.Println(foundStart)
 
 			if !foundStart {
 				imgBuff.Write(readBuff)
