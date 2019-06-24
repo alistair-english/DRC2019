@@ -43,6 +43,8 @@ func NewPiCamera() (*PiCamera, error) {
 				continue
 			}
 
+			fmt.Println(n)
+
 			foundStart := false
 
 			// check if we found the start of an image
@@ -70,6 +72,8 @@ func NewPiCamera() (*PiCamera, error) {
 					break
 				}
 			}
+
+			fmt.Println(foundStart)
 
 			if !foundStart {
 				imgBuff.Write(readBuff)
