@@ -66,30 +66,16 @@ func (cam *PiCamera) CameraConnectionTask() {
 				// we found a new image start point at i
 				foundStart = true
 
-				fmt.Println("i: ", i)
-				fmt.Println("preimg buff len: ", imgBuff.Len())
-
 				// write the rest of the old image into the currImg buffer
 				imgBuff.Write(readBuff[0:i])
-
-				fmt.Println("img buff len: ", imgBuff.Len())
 
 				if imgBuff.Len() > 0 {
 					// the was already part of an img in here - img must be done
 
 					// Copy the completed image out of the buffer and into the current img
-					fmt.Println("pre make")
 					cpyImg := make([]byte, imgBuff.Len())
-					fmt.Println("pre copy")
 					copy(cpyImg, imgBuff.Bytes())
-					fmt.Println("post copy")
 					cam.currImg = cpyImg
-					fmt.Println("len cpyImg: ", len(cpyImg))
-					fmt.Println("len picam: ", len(cam.currImg))
-					fmt.Println("cpyImg: ", cpyImg[:15])
-					fmt.Println("picam: ", cam.currImg[:15])
-					fmt.Print("bytes: ", imgBuff.Bytes()[:15])
-					fmt.Println()
 
 					select {
 					case cam.syncChan <- true:
@@ -98,8 +84,6 @@ func (cam *PiCamera) CameraConnectionTask() {
 					// reset the buffer
 					imgBuff.Reset()
 				}
-
-				fmt.Println("tik")
 
 				imgBuff.Write(readBuff[i:])
 				break
@@ -127,9 +111,7 @@ func (cam *PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<-
 			fmt.Println(len(cam.currImg))
 			fmt.Println(err)
 		}
-		fmt.Println("decode done")
 
 		imageResult <- true
-		fmt.Println("token done")
 	}
 }
