@@ -39,12 +39,12 @@ func NewPiCamera() (*PiCamera, error) {
 }
 
 // Init from the camera Implementation
-func (cam PiCamera) Init() {
+func (cam *PiCamera) Init() {
 	go cam.CameraConnectionTask()
 }
 
 // CameraConnectionTask is the task that talks to the rpi camera std out
-func (cam PiCamera) CameraConnectionTask() {
+func (cam *PiCamera) CameraConnectionTask() {
 	readBuff := make([]byte, 4096) // read in stream 4 kilobyte chunks
 	imgBuff := new(bytes.Buffer)
 
@@ -115,7 +115,7 @@ func (cam PiCamera) CameraConnectionTask() {
 }
 
 // RunImagePoller from the camera Implementation
-func (cam PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
+func (cam *PiCamera) RunImagePoller(imageRequest <-chan bool, imageResult chan<- bool, outputImg *gocv.Mat) {
 	for range imageRequest {
 		<-cam.syncChan
 
