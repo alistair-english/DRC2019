@@ -35,6 +35,11 @@ func (r *Router) Register(service Service) error {
 func (r *Router) Start() {
 	for request := range r.actionRequestChannel {
 		t := reflect.TypeOf(request)
-		r.actionToServiceMap[t].FulfullActionRequest(request)
+		service := r.actionToServiceMap[t]
+		if service != nil {
+			go service.FulfullActionRequest(request)
+		} else {
+			fmt.Println("No service for request type: ", t.Name())
+		}
 	}
 }

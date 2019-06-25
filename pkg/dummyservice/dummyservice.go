@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
+	"github.com/alistair-english/DRC2019/pkg/serialservice"
 )
 
 type DummyServiceA struct {
@@ -19,7 +20,7 @@ func NewDummyServiceA() *DummyServiceA {
 func (d *DummyServiceA) Start() {
 	go func() {
 		for {
-			d.actionRequestChannel <- DummyActionRequest{"hello world"}
+			d.actionRequestChannel <- serialservice.SerialSendActionReq{serialservice.Control{50, 50}}
 			time.Sleep(3 * time.Second)
 		}
 	}()
