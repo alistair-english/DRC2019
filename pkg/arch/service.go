@@ -5,6 +5,6 @@ import "reflect"
 type Service interface {
 	Start()
 	GetActionRequestType() reflect.Type
-	SetActionRequestChannel(chan<- ActionRequest)
-	FulfullActionRequest(ActionRequest)
+	SetActionRequestChannel(channel chan<- ActionRequest)
+	FulfullActionRequest(request ActionRequest)
 }
