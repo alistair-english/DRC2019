@@ -13,15 +13,16 @@ type DummyServiceA struct {
 }
 
 func NewDummyServiceA() *DummyServiceA {
-	return &DummyServiceA{make(chan arch.ActionRequest, 100)}
+	return &DummyServiceA{nil}
 }
 
 func (d *DummyServiceA) Start() {
 	go func() {
-		d.actionRequestChannel <- DummyActionRequest{"hello world"}
-		time.Sleep(3 * time.Second)
+		for {
+			d.actionRequestChannel <- DummyActionRequest{"hello world"}
+			time.Sleep(3 * time.Second)
+		}
 	}()
-
 }
 
 func (d *DummyServiceA) GetActionRequestType() reflect.Type {

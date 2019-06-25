@@ -20,14 +20,13 @@ func NewRouter() *Router {
 func (r *Router) Register(service Service) error {
 	// add the service to the action map
 	actionType := service.GetActionRequestType()
-	if actionType == nil {
-		return nil
-	}
-	if _, exists := r.actionToServiceMap[actionType]; exists {
-		return fmt.Errorf("Service already fulfilling ActionRequest of type: %v", actionType.String())
-	}
 
-	r.actionToServiceMap[actionType] = service
+	if actionType != nil {
+		if _, exists := r.actionToServiceMap[actionType]; exists {
+			return fmt.Errorf("Service already fulfilling ActionRequest of type: %v", actionType.String())
+		}
+		r.actionToServiceMap[actionType] = service
+	}
 
 	service.SetActionRequestChannel(r.actionRequestChannel)
 	return nil
