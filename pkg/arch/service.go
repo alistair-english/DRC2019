@@ -1,9 +1,10 @@
 package arch
 
-import "go/types"
+import "reflect"
 
 type Service interface {
 	Start()
-	GetActionRequestType() types.Type
+	GetActionRequestType() reflect.Type
 	SetActionRequestChannel(chan<- ActionRequest)
+	FulfullActionRequest(ActionRequest)
 }

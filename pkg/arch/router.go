@@ -2,20 +2,18 @@ package arch
 
 import (
 	"fmt"
-
-	"golang.org/x/tools/go/types/typeutil"
+	"reflect"
 )
 
 // Router is responsible for routing action requests to the correct service
 type Router struct {
-	actionToServiceMap   typeutil.Map
+	actionToServiceMap   map[reflect.Type]Service
 	actionRequestChannel chan ActionRequest
 }
 
 // NewRouter creates a router
 func NewRouter() *Router {
-	channel := make(chan ActionRequest, 1000)
-	return &Router{typeutil.Map{}, channel}
+	return &Router{make(map[reflect.Type]Service), make(chan ActionRequest, 1000)}
 }
 
 // Register a service to the router so it can route action requests
@@ -25,10 +23,19 @@ func (r *Router) Register(service Service) error {
 	if actionType == nil {
 		return nil
 	}
-	if r.actionToServiceMap.At(actionType) != nil {
+	if _, exists := r.actionToServiceMap[actionType]; exists {
 		return fmt.Errorf("Service already fulfilling ActionRequest of type: %v", actionType.String())
 	}
 
-	r.actionToServiceMap.Set(actionType, service)
+	r.actionToServiceMap[actionType] = service
+
+	service.SetActionRequestChannel(r.actionRequestChannel)
 	return nil
+}
+
+func (r *Router) Start() {
+	for request := range r.actionRequestChannel {
+		t := reflect.TypeOf(request)
+		r.actionToServiceMap[t].FulfullActionRequest(request)
+	}
 }
