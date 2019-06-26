@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/alistair-english/DRC2019/pkg/arch"
-	"github.com/alistair-english/DRC2019/pkg/cameraservice"
-	"github.com/alistair-english/DRC2019/pkg/dummyservice"
-	"github.com/alistair-english/DRC2019/pkg/serialservice"
+	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
+	"github.com/alistair-english/DRC2019/pkg/services/dummyservice"
+	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 )
 
 func main() {

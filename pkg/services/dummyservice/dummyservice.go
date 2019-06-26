@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/alistair-english/DRC2019/pkg/cameraservice"
 	"gocv.io/x/gocv"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
-	"github.com/alistair-english/DRC2019/pkg/serialservice"
+	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
+	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 )
 
 type DummyServiceA struct {
