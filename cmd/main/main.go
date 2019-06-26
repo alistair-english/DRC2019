@@ -9,19 +9,6 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/serial"
 )
 
-func processImg(img gocv.Mat, motionCtrlChan chan<- serial.Control) {
-	// This is where the image gets processed and then we send a move control struct to the serial.
-	if img.Rows() < 1 || img.Cols() < 1 {
-		fmt.Println("processing 0 image")
-		return
-	}
-	fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
-	motionCtrlChan <- serial.Control{
-		Dir: 0,
-		Spd: 50,
-	}
-}
-
 func main() {
 	// Camera Setup
 	camImg := gocv.NewMat()
@@ -44,12 +31,15 @@ func main() {
 	// serConn, _ := serial.NewConnection(ser)
 
 	// TESTING SETUP
-	cam := camera.NewFileReaderCamera("/home/alistair/Dev/go/src/github.com/alistair-english/DRC2019/cmd/recordtodisk/recording_06-24-2019_45:23:45.avi")
+	cam := camera.NewFileReaderCamera("../recordtodisk/recording_06-25-2019_16:10:16.avi")
 	camConn := camera.NewConnection(cam, &camImg)
 
 	// Serial Setup
 	ser := serial.FakeSerial{}
 	serConn, _ := serial.NewConnection(ser)
+
+	// CV Process
+	
 
 	displayWindow := gocv.NewWindow("Display")
 	defer displayWindow.Close()
@@ -62,7 +52,7 @@ func main() {
 			// Img is ready to be processed
 			if camImg.Rows() > 0 || camImg.Cols() > 0 {
 				displayWindow.IMShow(camImg)
-				displayWindow.WaitKey(1)
+				displayWindow.WaitKey(0)
 			}
 
 			// Spawn a go routine to do the heavy processing and then talk to serial when its done
