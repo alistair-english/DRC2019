@@ -19,7 +19,7 @@ func NewGoCVCamera() (*CameraService, error) {
 
 // NewPiCamera creates a new camera service that connects to a PiCamera
 func NewPiCamera() (*CameraService, error) {
-	cam, err := NewPiCameraImplementation()
+	cam, err := newPiCameraImplementation()
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func NewPiCamera() (*CameraService, error) {
 
 // NewFileReaderCamera creates a new camera service that connects to a FileReaderCamera
 func NewFileReaderCamera(file string) (*CameraService, error) {
-	cam, err := NewFileReaderCameraImplementation(file)
+	cam, err := newFileReaderCameraImplementation(file)
 	if err != nil {
 		return nil, err
 	}

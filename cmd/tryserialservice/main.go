@@ -12,7 +12,7 @@ func main() {
 
 	serviceA := dummyservice.NewDummyServiceA()
 	serService, _ := serialservice.NewFakeSerial()
-	camService, _ := cameraservice.NewGoCVCamera()
+	camService, _ := cameraservice.NewFileReaderCamera("")
 
 	router.Register(serviceA)
 	router.Register(serService)
