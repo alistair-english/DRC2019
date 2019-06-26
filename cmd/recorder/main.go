@@ -10,7 +10,7 @@ func main() {
 	router := arch.NewRouter()
 
 	recService := cvservice.NewRecorderService("")
-	camService, _ := cameraservice.NewGoCVCamera()
+	camService, _ := cameraservice.NewPiCamera()
 
 	router.Register(recService)
 	router.Register(camService)
