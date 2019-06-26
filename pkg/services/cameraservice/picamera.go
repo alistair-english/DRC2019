@@ -104,6 +104,8 @@ func (cam *PiCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 			fmt.Println(err)
 		}
 
-		req.ResponseChannel <- true
+		select {
+		case req.ResponseChannel <- true:
+		}
 	}
 }

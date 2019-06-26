@@ -18,6 +18,8 @@ func (g *GoCVCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 
 	for req := range imgRequests {
 		cam.Read(req.Img)
-		req.ResponseChannel <- true
+		select {
+		case req.ResponseChannel <- true:
+		}
 	}
 }
