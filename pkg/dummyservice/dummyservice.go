@@ -3,7 +3,9 @@ package dummyservice
 import (
 	"fmt"
 	"reflect"
-	"time"
+
+	"github.com/alistair-english/DRC2019/pkg/cameraservice"
+	"gocv.io/x/gocv"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/serialservice"
@@ -19,9 +21,19 @@ func NewDummyServiceA() *DummyServiceA {
 
 func (d *DummyServiceA) Start() {
 	go func() {
+		chann := make(chan bool, 1)
+		img := gocv.NewMat()
+		defer img.Close()
+
+		displayWindow := gocv.NewWindow("Display")
+		defer displayWindow.Close()
+
 		for {
+			d.actionRequestChannel <- cameraservice.GetImageActionReq{&img, chann}
+			<-chann
+			displayWindow.IMShow(img)
+			displayWindow.WaitKey(1)
 			d.actionRequestChannel <- serialservice.SerialSendActionReq{serialservice.Control{50, 50}}
-			time.Sleep(3 * time.Second)
 		}
 	}()
 }

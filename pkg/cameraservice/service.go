@@ -14,7 +14,7 @@ type CameraService struct {
 
 // NewGoCVCamera creates a new camera service that connects to a GoCVCamera
 func NewGoCVCamera() (*CameraService, error) {
-	return &CameraService{nil, &GoCVCamera{}}, nil
+	return &CameraService{make(chan GetImageActionReq, 50), &GoCVCamera{}}, nil
 }
 
 // NewPiCamera creates a new camera service that connects to a PiCamera
@@ -24,7 +24,7 @@ func NewPiCamera() (*CameraService, error) {
 		return nil, err
 	}
 
-	return &CameraService{nil, cam}, nil
+	return &CameraService{make(chan GetImageActionReq, 50), cam}, nil
 }
 
 // NewFileReaderCamera creates a new camera service that connects to a FileReaderCamera
@@ -34,7 +34,7 @@ func NewFileReaderCamera(file string) (*CameraService, error) {
 		return nil, err
 	}
 
-	return &CameraService{nil, cam}, nil
+	return &CameraService{make(chan GetImageActionReq, 50), cam}, nil
 }
 
 // Start from Service interface

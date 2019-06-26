@@ -97,13 +97,13 @@ func (cam *PiCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 
 		img, err := gocv.IMDecode(cam.currImg, gocv.IMReadUnchanged)
 		if err == nil {
-			img.CopyTo(req.img)
+			img.CopyTo(req.Img)
 			img.Close()
 		} else {
 			fmt.Println(len(cam.currImg))
 			fmt.Println(err)
 		}
 
-		req.responseChannel <- true
+		req.ResponseChannel <- true
 	}
 }
