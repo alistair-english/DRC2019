@@ -48,16 +48,19 @@ func (c *CalibratorService) Start() {
 		sourceWindow := gocv.NewWindow("Source Image")
 		defer displayWindow.Close()
 
+		sliderWindow := gocv.NewWindow("Sliders")
+		defer sliderWindow.Close()
+
 		// Make the sliders
 		var (
-			upperH = displayWindow.CreateTrackbar("Upper H", 255)
-			lowerH = displayWindow.CreateTrackbar("Lower H", 255)
+			upperH = sliderWindow.CreateTrackbar("Upper H", 255)
+			lowerH = sliderWindow.CreateTrackbar("Lower H", 255)
 
-			upperS = displayWindow.CreateTrackbar("Upper S", 255)
-			lowerS = displayWindow.CreateTrackbar("Lower S", 255)
+			upperS = sliderWindow.CreateTrackbar("Upper S", 255)
+			lowerS = sliderWindow.CreateTrackbar("Lower S", 255)
 
-			upperV = displayWindow.CreateTrackbar("Upper V", 255)
-			lowerV = displayWindow.CreateTrackbar("Lower V", 255)
+			upperV = sliderWindow.CreateTrackbar("Upper V", 255)
+			lowerV = sliderWindow.CreateTrackbar("Lower V", 255)
 		)
 
 		var (
@@ -113,6 +116,10 @@ func (c *CalibratorService) Start() {
 			prevUpperHSV = gocv.NewScalar(0, 0, 0, 0)
 		)
 
+		// Read Image
+		c.actionRequestChannel <- cameraservice.GetImageActionReq{&sourceImg, imgReadChannel}
+		<-imgReadChannel
+
 		for { // foreva
 
 			lowerHSV = hsvScalarFromSliders(
@@ -139,10 +146,6 @@ func (c *CalibratorService) Start() {
 					cols)
 			}
 
-			// Read Image
-			c.actionRequestChannel <- cameraservice.GetImageActionReq{&sourceImg, imgReadChannel}
-			<-imgReadChannel
-
 			// convert to HSV
 			gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 
@@ -156,8 +159,15 @@ func (c *CalibratorService) Start() {
 			displayWindow.IMShow(threshImg)
 			sourceWindow.IMShow(sourceImg)
 
-			displayWindow.WaitKey(0)
-			sourceWindow.WaitKey(0)
+			displayWindow.WaitKey(1)
+
+			// Wait for space
+			key := sourceWindow.WaitKey(500)
+			if key == 32 {
+				// Read Image
+				c.actionRequestChannel <- cameraservice.GetImageActionReq{&sourceImg, imgReadChannel}
+				<-imgReadChannel
+			}
 		}
 	}()
 }
