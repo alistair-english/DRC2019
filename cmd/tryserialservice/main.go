@@ -11,6 +11,7 @@ func main() {
 
 	serviceA := dummyservice.NewDummyServiceA()
 	serService, _ := serialservice.NewFakeSerial()
+	
 
 	router.Register(serviceA)
 	router.Register(serService)

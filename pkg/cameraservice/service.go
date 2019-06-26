@@ -12,6 +12,31 @@ type CameraService struct {
 	cameraImplementation Implementation
 }
 
+// NewGoCVCamera creates a new camera service that connects to a GoCVCamera
+func NewGoCVCamera() (*CameraService, error) {
+	return &CameraService{nil, &GoCVCamera{}}, nil
+}
+
+// NewPiCamera creates a new camera service that connects to a PiCamera
+func NewPiCamera() (*CameraService, error) {
+	cam, err := NewPiCameraImplementation()
+	if err != nil {
+		return nil, err
+	}
+
+	return &CameraService{nil, cam}, nil
+}
+
+// NewFileReaderCamera creates a new camera service that connects to a FileReaderCamera
+func NewFileReaderCamera(file string) (*CameraService, error) {
+	cam, err := NewFileReaderCameraImplementation(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CameraService{nil, cam}, nil
+}
+
 // Start from Service interface
 func (c *CameraService) Start() {
 	go c.cameraImplementation.RunCameraConnection(c.imageRequests)

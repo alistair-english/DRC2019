@@ -9,9 +9,12 @@ type FileReaderCamera struct {
 }
 
 // NewFileReaderCameraImplementation creates a new camera implementation that will serve up from a video
-func NewFileReaderCameraImplementation(path string) *FileReaderCamera {
-	vid, _ := gocv.VideoCaptureFile(path)
-	return &FileReaderCamera{path, vid}
+func NewFileReaderCameraImplementation(path string) (*FileReaderCamera, error) {
+	vid, err := gocv.VideoCaptureFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return &FileReaderCamera{path, vid}, nil
 }
 
 // RunCameraConnection from camera Implementation
