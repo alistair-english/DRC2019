@@ -21,6 +21,8 @@ func newFileReaderCameraImplementation(path string) (*FileReaderCamera, error) {
 func (cam FileReaderCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 	for req := range imgRequests {
 		cam.Capture.Read(req.Img)
-		req.ResponseChannel <- true
+		select {
+		case req.ResponseChannel <- true:
+		}
 	}
 }
