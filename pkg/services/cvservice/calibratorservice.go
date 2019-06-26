@@ -4,7 +4,6 @@ import (
 	"reflect"
 
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
-	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"gocv.io/x/gocv"
@@ -78,8 +77,7 @@ func (c *CalibratorService) Start() {
 		imgReadChannel := make(chan bool, 1)
 
 		// Get an image
-		c.actionRequestChannel <- cameraservice.GetImageActionReq{&sourceImg, imgReadChannel}
-		<-imgReadChannel
+		getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
 
 		// Convert to HSV
 		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
@@ -117,8 +115,7 @@ func (c *CalibratorService) Start() {
 		)
 
 		// Read Image
-		c.actionRequestChannel <- cameraservice.GetImageActionReq{&sourceImg, imgReadChannel}
-		<-imgReadChannel
+		getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
 
 		for { // foreva
 
@@ -165,8 +162,7 @@ func (c *CalibratorService) Start() {
 			key := sourceWindow.WaitKey(500)
 			if key == 32 {
 				// Read Image
-				c.actionRequestChannel <- cameraservice.GetImageActionReq{&sourceImg, imgReadChannel}
-				<-imgReadChannel
+				getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
 			}
 		}
 	}()
