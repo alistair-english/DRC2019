@@ -1,12 +1,27 @@
-package serial
+package serialservice
 
 import (
 	"errors"
 	"fmt"
-	t "time"
+	"time"
 
 	"github.com/tarm/serial"
 )
+
+// Serial Info Config
+const (
+	SerialHeaderSize = 4   // Yeet
+	SerialSync1      = 255 // Filler
+	SerialSync2      = 255 // Filler
+)
+
+// Header is the header information for the serial comms
+type Header struct {
+	Sync1 uint8
+	Sync2 uint8
+	Type  uint8
+	Size  uint8
+}
 
 //Implementation is the interface for serial
 type Implementation interface {
@@ -36,7 +51,7 @@ func (s FakeSerial) RunSerialRx(readChan chan<- []byte) error {
 type PiSerial struct {
 	Port       string
 	Baud       int
-	Timeout    t.Duration
+	Timeout    time.Duration
 	connection *serial.Port
 }
 
