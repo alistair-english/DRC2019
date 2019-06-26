@@ -12,7 +12,7 @@ func main() {
 
 	serviceA := dummyservice.NewDummyServiceA()
 	serService, _ := serialservice.NewFakeSerial()
-	camService, _ := cameraservice.NewFileReaderCamera("")
+	camService, _ := cameraservice.NewFileReaderCamera("/home/alistair/Dev/go/src/github.com/alistair-english/DRC2019/cmd/recordtodisk/recording_06-25-2019_16:10:16.avi")
 
 	router.Register(serviceA)
 	router.Register(serService)
