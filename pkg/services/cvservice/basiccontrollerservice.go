@@ -1,6 +1,7 @@
 package cvservice
 
 import (
+	"fmt"
 	"image"
 	"math"
 	"reflect"
@@ -200,6 +201,8 @@ func (c *BasicControllerService) Start() {
 					Spd: int8((cartLen / diagonalLen) * 100),
 				},
 			}
+
+			fmt.Println(CartesianToDriveAngle(cartAngle), " ", int8((cartLen/diagonalLen)*100))
 
 			// Display source img
 			// displayWindow.IMShow(sourceImg)
