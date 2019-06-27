@@ -49,6 +49,7 @@ func (cam *PiCamera) CameraConnectionTask() {
 		n, err := cam.stdOut.Read(readBuff)
 		if err != nil {
 			// Should probably log here but for now just retry reading
+			fmt.Println(err)
 			continue
 		}
 
@@ -73,6 +74,7 @@ func (cam *PiCamera) CameraConnectionTask() {
 
 					select {
 					case cam.syncChan <- true:
+					default:
 					}
 
 					// reset the buffer
@@ -106,6 +108,7 @@ func (cam *PiCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 
 		select {
 		case req.ResponseChannel <- true:
+		default:
 		}
 	}
 }

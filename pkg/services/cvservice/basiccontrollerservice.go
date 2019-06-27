@@ -70,7 +70,7 @@ func (c *BasicControllerService) Start() {
 		// Calculate our HSV masks
 		channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
-		diagonalLen := math.Sqrt(math.Pow(float64(rows), 2) + math.Pow(float64(cols)/2, 2))
+		// diagonalLen := math.Sqrt(math.Pow(float64(rows), 2) + math.Pow(float64(cols)/2, 2))
 
 		var processMask cvhelpers.ImageMod = func(src gocv.Mat, dst *gocv.Mat) {
 			// Blur the mask
@@ -193,19 +193,19 @@ func (c *BasicControllerService) Start() {
 			cartY := rows - vertCoord
 
 			cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
-			cartLen := math.Sqrt(math.Pow(float64(cartY), 2) + math.Pow(float64(cartX), 2))
+			// cartLen := math.Sqrt(math.Pow(float64(cartY), 2) + math.Pow(float64(cartX), 2))
 
 			driveAngle := CartesianToDriveAngle(cartAngle)
-			driveSpeed := int8((cartLen / diagonalLen) * 100)
+			// driveSpeed := int8((cartLen / diagonalLen) * 100)
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{
 				serialservice.Control{
 					Dir: -driveAngle,
-					Spd: driveSpeed,
+					Spd: 100,
 				},
 			}
 
-			fmt.Println("Spd: %v Dir: %v (%v)", driveSpeed, driveAngle, -driveAngle)
+			fmt.Println(driveAngle, -driveAngle)
 
 			// Display source img
 			// displayWindow.IMShow(sourceImg)

@@ -70,6 +70,7 @@ func main() {
 
 						select {
 						case channel <- true:
+						default:
 						}
 
 						// reset the buffer

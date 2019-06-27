@@ -31,6 +31,7 @@ func (conn Connection) init() {
 func (conn Connection) RequestImage() {
 	select {
 	case conn.ImageRequest <- true:
+	default:
 	}
 	// Select will only choose non-blocking channel operations.
 	// Therefore if there is already an image request in the channel writing another
