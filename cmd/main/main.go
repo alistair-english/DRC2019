@@ -12,13 +12,13 @@ import (
 func main() {
 	router := arch.NewRouter()
 
-	serService, err := serialservice.NewFakeSerial()
+	serService, err := serialservice.NewPiSerial()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	camService, err := cameraservice.NewFileReaderCamera("/home/alistair/Dev/go/src/github.com/alistair-english/DRC2019/cmd/recorder/recording_06-26-2019_48:34:48.avi")
+	camService, err := cameraservice.NewPiCamera()
 	if err != nil {
 		fmt.Println(err)
 		return
