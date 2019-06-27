@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
+	"github.com/alistair-english/DRC2019/pkg/config"
 	"github.com/alistair-english/DRC2019/pkg/gohelpers"
 	"github.com/tarm/serial"
 )
@@ -17,12 +18,15 @@ type SerialService struct {
 }
 
 // NewPiSerial creates a new PiSerial object
-func NewPiSerial(port string, baud int, timeout time.Duration) (*SerialService, error) {
+func NewPiSerial() (*SerialService, error) {
+
+	serialConfig := config.GetSerialConfig()
+
 	// Setup serial options
 	options := serial.Config{
-		Name:        port,
-		Baud:        baud,
-		ReadTimeout: timeout,
+		Name:        serialConfig.Port,
+		Baud:        serialConfig.Baud,
+		ReadTimeout: time.Duration(serialConfig.TimeoutMs) * time.Millisecond,
 		Size:        8,
 		StopBits:    1,
 		Parity:      'N',
@@ -33,7 +37,7 @@ func NewPiSerial(port string, baud int, timeout time.Duration) (*SerialService, 
 		return nil, err
 	}
 
-	serialImplementation := &PiSerial{port, baud, timeout, conn}
+	serialImplementation := &PiSerial{conn}
 
 	txChannel := make(chan []byte, 50)
 	rxChannel := make(chan []byte, 50)

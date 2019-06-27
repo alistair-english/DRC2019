@@ -3,7 +3,6 @@ package serialservice
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/tarm/serial"
 )
@@ -49,9 +48,6 @@ func (s FakeSerial) RunSerialRx(readChan chan<- []byte) error {
 
 // PiSerial is the serial implementation
 type PiSerial struct {
-	Port       string
-	Baud       int
-	Timeout    time.Duration
 	connection *serial.Port
 }
 
