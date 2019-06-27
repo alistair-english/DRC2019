@@ -71,7 +71,6 @@ func (cam *PiCamera) CameraConnectionTask() {
 				imgBuff.Write(readBuff[0:i])
 
 				fmt.Println(imgBuff.Len())
-				fmt.Println(imgBuff.Bytes()[:10])
 
 				if imgBuff.Len() > 0 {
 					// the was already part of an img in here - img must be done
