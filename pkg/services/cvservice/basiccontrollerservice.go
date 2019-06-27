@@ -195,14 +195,17 @@ func (c *BasicControllerService) Start() {
 			cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 			cartLen := math.Sqrt(math.Pow(float64(cartY), 2) + math.Pow(float64(cartX), 2))
 
+			driveAngle := CartesianToDriveAngle(cartAngle)
+			driveSpeed := int8((cartLen / diagonalLen) * 100)
+
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{
 				serialservice.Control{
-					Dir: CartesianToDriveAngle(cartAngle),
-					Spd: int8((cartLen / diagonalLen) * 100),
+					Dir: -driveAngle,
+					Spd: driveSpeed,
 				},
 			}
 
-			fmt.Println(CartesianToDriveAngle(cartAngle), " ", int8((cartLen/diagonalLen)*100))
+			fmt.Println("Spd: %v Dir: %v (%v)", driveSpeed, driveAngle, -driveAngle)
 
 			// Display source img
 			// displayWindow.IMShow(sourceImg)
