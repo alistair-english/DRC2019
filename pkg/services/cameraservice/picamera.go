@@ -66,10 +66,12 @@ func (cam *PiCamera) CameraConnectionTask() {
 				foundStart = true
 
 				fmt.Println(imgBuff.Len())
-				fmt.Println(imgBuff.Bytes()[:40])
 
 				// write the rest of the old image into the currImg buffer
 				imgBuff.Write(readBuff[0:i])
+
+				fmt.Println(imgBuff.Len())
+				fmt.Println(imgBuff.Bytes()[:10])
 
 				if imgBuff.Len() > 0 {
 					// the was already part of an img in here - img must be done
