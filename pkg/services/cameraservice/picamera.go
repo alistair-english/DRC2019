@@ -71,6 +71,8 @@ func (cam *PiCamera) CameraConnectionTask() {
 					copy(cpyImg, imgBuff.Bytes())
 					cam.currImg = cpyImg
 
+					fmt.Println(cam.currImg[:30])
+
 					select {
 					case cam.syncChan <- true:
 					}
