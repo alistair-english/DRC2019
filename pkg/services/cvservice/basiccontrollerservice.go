@@ -70,7 +70,7 @@ func (c *BasicControllerService) Start() {
 		// Calculate our HSV masks
 		channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
-		diagonalLen := math.Sqrt(math.Pow(float64(rows), 2) + math.Pow(float64(cols)/2, 2))
+		// diagonalLen := math.Sqrt(math.Pow(float64(rows), 2) + math.Pow(float64(cols)/2, 2))
 
 		var processMask cvhelpers.ImageMod = func(src gocv.Mat, dst *gocv.Mat) {
 			// Blur the mask
