@@ -23,6 +23,7 @@ func (cam FileReaderCamera) RunCameraConnection(imgRequests <-chan GetImageActio
 		cam.Capture.Read(req.Img)
 		select {
 		case req.ResponseChannel <- true:
+		default:
 		}
 	}
 }

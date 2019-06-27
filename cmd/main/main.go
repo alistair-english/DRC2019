@@ -5,6 +5,7 @@ import (
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
+	"github.com/alistair-english/DRC2019/pkg/services/cvservice"
 	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 )
 
@@ -27,14 +28,14 @@ func main() {
 	}
 	fmt.Println("Done.")
 
-	// fmt.Print("Getting controller... ")
-	// ctrlService := &cvservice.BasicControllerService{}
-	// fmt.Println("Done.")
+	fmt.Print("Getting controller... ")
+	ctrlService := &cvservice.BasicControllerService{}
+	fmt.Println("Done.")
 
 	fmt.Print("Registering services... ")
 	router.Register(serService)
 	router.Register(camService)
-	// router.Register(ctrlService)
+	router.Register(ctrlService)
 	fmt.Println("Done.")
 
 	fmt.Print("Starting Serial... ")
@@ -45,9 +46,9 @@ func main() {
 	camService.Start()
 	fmt.Println("Done.")
 
-	// fmt.Println("Starting Controller... ")
-	// ctrlService.Start()
-	// fmt.Println("Done.")
+	fmt.Println("Starting Controller... ")
+	ctrlService.Start()
+	fmt.Println("Done.")
 
 	fmt.Println("Starting Router (blocking)")
 	// router is blocking

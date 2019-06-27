@@ -55,22 +55,14 @@ func (cam *PiCamera) CameraConnectionTask() {
 
 		foundStart := false
 
-		fmt.Println(n)
-		fmt.Println(len(readBuff))
-		fmt.Println(readBuff[:40])
-
 		// check if we found the start of an image
 		for i := 0; i <= (n - len(jpgStart)); i++ {
 			if bytes.Compare(readBuff[i:i+len(jpgStart)], jpgStart) == 0 {
 				// we found a new image start point at i
 				foundStart = true
 
-				fmt.Println(imgBuff.Len())
-
 				// write the rest of the old image into the currImg buffer
 				imgBuff.Write(readBuff[0:i])
-
-				fmt.Println(imgBuff.Len())
 
 				if imgBuff.Len() > 0 {
 					// the was already part of an img in here - img must be done
@@ -79,8 +71,6 @@ func (cam *PiCamera) CameraConnectionTask() {
 					cpyImg := make([]byte, imgBuff.Len())
 					copy(cpyImg, imgBuff.Bytes())
 					cam.currImg = cpyImg
-
-					fmt.Println(cam.currImg[:30])
 
 					select {
 					case cam.syncChan <- true:
@@ -95,9 +85,6 @@ func (cam *PiCamera) CameraConnectionTask() {
 				break
 			}
 		}
-
-		fmt.Println(foundStart)
-		fmt.Println()
 
 		if !foundStart {
 			imgBuff.Write(readBuff)
@@ -121,6 +108,7 @@ func (cam *PiCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 
 		select {
 		case req.ResponseChannel <- true:
+		default:
 		}
 	}
 }
