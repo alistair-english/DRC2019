@@ -37,16 +37,16 @@ func (l *logger) Init() {
 	l.title = "DEFAULT_LOG"
 }
 
-func (l *logger) SetMode(stream io.Writer, title string) {
+func (l *logger) SetStream(stream io.Writer, title string) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	fmt.Printf("Changing Log Stream: [%v -> %v] \n", title, l.title)
 	l.stream = stream
+	l.Logln("---Changing Log Stream--- [%v -> %v]", title, l.title)
 	l.title = title
-	fmt.Printf("Changing Log Stream to %v", title)
-	l.Log("---Changing Log Mode To %v ---", title)
 }
 
-func (l *logger) GetMode() (io.Writer, string) {
+func (l *logger) GetStream() (io.Writer, string) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	return l.stream, l.title
