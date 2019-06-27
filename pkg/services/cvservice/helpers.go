@@ -13,3 +13,13 @@ func getImgBlocking(actionReqChannel chan<- arch.ActionRequest, img *gocv.Mat, t
 	}
 	<-timingChannel
 }
+
+func CartesianToDriveAngle(cartAngle float64) int8 {
+	if cartAngle <= 90 {
+		return int8(-(cartAngle - 90))
+	} else if cartAngle <= 180 {
+		return int8(cartAngle - 90)
+	} else {
+		return 0
+	}
+}

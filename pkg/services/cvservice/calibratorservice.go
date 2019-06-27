@@ -52,14 +52,13 @@ func (c *CalibratorService) Start() {
 
 		// Make the sliders
 		var (
-			upperH = sliderWindow.CreateTrackbar("Upper H", 255)
 			lowerH = sliderWindow.CreateTrackbar("Lower H", 255)
-
-			upperS = sliderWindow.CreateTrackbar("Upper S", 255)
 			lowerS = sliderWindow.CreateTrackbar("Lower S", 255)
-
-			upperV = sliderWindow.CreateTrackbar("Upper V", 255)
 			lowerV = sliderWindow.CreateTrackbar("Lower V", 255)
+
+			upperH = sliderWindow.CreateTrackbar("Upper H", 255)
+			upperS = sliderWindow.CreateTrackbar("Upper S", 255)
+			upperV = sliderWindow.CreateTrackbar("Upper V", 255)
 		)
 
 		var (
@@ -91,20 +90,24 @@ func (c *CalibratorService) Start() {
 					0,
 					0,
 					0,
-					0.0),
+					0.0,
+				),
 				channels,
 				rows,
-				cols)
+				cols,
+			)
 
 			upperMask = cvhelpers.NewHSVMask(
 				gocv.NewScalar(
 					0,
 					0,
 					0,
-					0.0),
+					0.0,
+				),
 				channels,
 				rows,
-				cols)
+				cols,
+			)
 		)
 
 		var (
@@ -122,25 +125,34 @@ func (c *CalibratorService) Start() {
 			lowerHSV = hsvScalarFromSliders(
 				lowerH,
 				lowerS,
-				lowerV)
+				lowerV,
+			)
 
 			upperHSV = hsvScalarFromSliders(
 				upperH,
 				upperS,
-				upperV)
+				upperV,
+			)
 
-			if lowerHSV != prevLowerHSV || upperHSV != prevUpperHSV {
-				lowerMask = cvhelpers.NewHSVMask(
-					lowerHSV,
-					channels,
-					rows,
-					cols)
+			// Wait for space
+			key := displayWindow.WaitKey(500)
+			if key == 13 {
+				if lowerHSV != prevLowerHSV || upperHSV != prevUpperHSV {
+					lowerMask = cvhelpers.NewHSVMask(
+						lowerHSV,
+						channels,
+						rows,
+						cols)
 
-				upperMask = cvhelpers.NewHSVMask(
-					upperHSV,
-					channels,
-					rows,
-					cols)
+					upperMask = cvhelpers.NewHSVMask(
+						upperHSV,
+						channels,
+						rows,
+						cols)
+
+					prevLowerHSV = lowerHSV
+					prevUpperHSV = upperHSV
+				}
 			}
 
 			// convert to HSV
@@ -149,17 +161,12 @@ func (c *CalibratorService) Start() {
 			// Calculate threshold
 			gocv.InRange(hsvImg, lowerMask, upperMask, &threshImg)
 
-			prevLowerHSV = lowerHSV
-			prevUpperHSV = upperHSV
-
 			// Display Images
 			displayWindow.IMShow(threshImg)
 			sourceWindow.IMShow(sourceImg)
 
-			displayWindow.WaitKey(1)
-
 			// Wait for space
-			key := sourceWindow.WaitKey(500)
+			key = sourceWindow.WaitKey(500)
 			if key == 32 {
 				// Read Image
 				getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
