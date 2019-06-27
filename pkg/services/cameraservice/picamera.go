@@ -84,6 +84,7 @@ func (cam *PiCamera) CameraConnectionTask() {
 
 					select {
 					case cam.syncChan <- true:
+					default:
 					}
 
 					// reset the buffer
