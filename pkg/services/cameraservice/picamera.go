@@ -20,7 +20,7 @@ type PiCamera struct {
 
 // NewPiCameraImplementation creates a new PiCamera Implementation
 func newPiCameraImplementation() (*PiCamera, error) {
-	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
+	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-", "-md", "7")
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
