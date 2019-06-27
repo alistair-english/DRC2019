@@ -1,9 +1,13 @@
 package main
 
 import (
-	"github.com/alistair-english/DRC2019/pkg/logging"
 	"os"
+	"time"
+
+	"github.com/alistair-english/DRC2019/pkg/logging"
 )
+
+const TAG string = "LOG TEST"
 
 func main() {
 	log := logging.Logger()
@@ -12,7 +16,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	log.SetStream(f, "SERIAL_LOG")
-	log.Logln("Hello World!")
-	log.Log("From the Logger! %v", 10)
+
+	for {
+		log.Logln(TAG, "Hello World!")
+		log.Log(TAG, "From the Logger! %v", 10)
+		time.Sleep(1 * time.Second)
+	}
+
 }

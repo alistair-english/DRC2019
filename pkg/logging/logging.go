@@ -52,14 +52,14 @@ func (l *logger) GetStream() (io.Writer, string) {
 	return l.stream, l.title
 }
 
-func (l *logger) Log(format string, v ...interface{}) {
+func (l *logger) Log(tag string, format string, v ...interface{}) {
 	// I would like to replace fmt.Sprintf with custom function but this will do
-	l.stream.Write([]byte(fmt.Sprintf(format, v...)))
+	l.stream.Write([]byte(fmt.Sprintf(tag+": "+format, v...)))
 }
 
-func (l *logger) Logln(format string, v ...interface{}) {
+func (l *logger) Logln(tag string, format string, v ...interface{}) {
 	// I would like to replace fmt.Sprintf with custom function but this will do
-	l.stream.Write([]byte(fmt.Sprintf(format+"\n", v...)))
+	l.stream.Write([]byte(fmt.Sprintf(tag+": "+format+"\n", v...)))
 }
 
 // Logger creates a new logger, if one doesnt already exist
