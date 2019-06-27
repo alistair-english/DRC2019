@@ -1,5 +1,7 @@
 package gohelpers
 
+import "math"
+
 // MaxFloat64 returns the index and value of the largest Float64 in a slice
 func MaxFloat64(slice []float64) (i int, val float64) {
 	var maxI int = 0
@@ -21,4 +23,14 @@ func B2i(b bool) int {
 		return 1
 	}
 	return 0
+}
+
+// DegToRad converts degrees to radians
+func DegToRad(deg float64) float64 {
+	return deg * (math.Pi / 180)
+}
+
+// RadToDeg converts radians to degrees
+func RadToDeg(rad float64) float64 {
+	return rad * (180 / math.Pi)
 }
