@@ -40,8 +40,8 @@ func main() {
 	imgBuff := new(bytes.Buffer)
 	currImg := make([]byte, buffLen)
 
-	// go func() {
-	func() {
+	go func() {
+		// func() {
 		for {
 			n, err := stdOut.Read(readBuff)
 			if err != nil {
@@ -65,18 +65,18 @@ func main() {
 		}
 	}()
 
-	// for {
-	// 	if len(imgBuff) > 0 {
-	// 		img, err := gocv.NewMatFromBytes(height, width, gocv.MatTypeCV8UC3, imgBuff)
-	// 		if err != nil {
-	// 			fmt.Println(err)
-	// 		}
+	for {
+		if len(currImg) > 0 {
+			img, err := gocv.NewMatFromBytes(height, width, gocv.MatTypeCV8UC3, currImg)
+			if err != nil {
+				fmt.Println(err)
+			}
 
-	// 		displayWindow.IMShow(img)
-	// 		// displayWindow.WaitKey(1)
-	// 		// fmt.Println(len(currImg))
-	// 		// fmt.Println(img.Size())
-	// 		img.Close()
-	// 	}
-	// }
+			displayWindow.IMShow(img)
+			// displayWindow.WaitKey(1)
+			// fmt.Println(len(currImg))
+			// fmt.Println(img.Size())
+			img.Close()
+		}
+	}
 }
