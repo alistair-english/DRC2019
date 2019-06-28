@@ -22,7 +22,7 @@ type PiCamera struct {
 
 func getPiCameraCmd() *exec.Cmd {
 	cfg := config.GetPiCameraConfig()
-	cmd := exec.Command("raspivid", "-t", "0", "-o", "-")
+	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
 	var args []string
 	if cfg.AWB != "" {
 		args = append(args, "-awb", cfg.AWB)
