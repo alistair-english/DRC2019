@@ -109,6 +109,8 @@ func main() {
 			}
 
 			// fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
+			fmt.Println(len(currImg))
+			fmt.Println(len(img.ToBytes()))
 			fmt.Println(img.Cols(), img.Rows())
 
 			// displayWindow.IMShow(img)
