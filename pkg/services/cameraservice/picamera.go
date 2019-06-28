@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strconv"
 
+	"github.com/alistair-english/DRC2019/pkg/config"
 	"gocv.io/x/gocv"
 )
 
@@ -18,9 +20,55 @@ type PiCamera struct {
 	stdOut   io.ReadCloser
 }
 
+func getPiCameraCmd() *exec.Cmd {
+	cfg := config.GetPiCameraConfig()
+	cmd := exec.Command("raspivid", "-t", "0", "-o", "-")
+	var args []string
+	if cfg.AWB != "" {
+		args = append(args, "-awb", cfg.AWB)
+	}
+	if cfg.Bitrate != 0 {
+		args = append(args, "-b", strconv.Itoa(cfg.Bitrate))
+	}
+	if cfg.Brightness != 0 {
+		args = append(args, "-br", strconv.Itoa(cfg.Brightness))
+	}
+	if cfg.Contrast != 0 {
+		args = append(args, "-co", strconv.Itoa(cfg.Contrast))
+	}
+	if cfg.Exposure != "" {
+		args = append(args, "-ex", cfg.Exposure)
+	}
+	if cfg.FPS != 0 {
+		args = append(args, "-fps", strconv.Itoa(cfg.FPS))
+	}
+	if cfg.Height != 0 {
+		args = append(args, "-h", strconv.Itoa(cfg.Height))
+	}
+	if cfg.Mode != 0 {
+		args = append(args, "-md", strconv.Itoa(cfg.Mode))
+	}
+	if cfg.ROI != "" {
+		args = append(args, "-roi", cfg.ROI)
+	}
+	if cfg.Saturation != 0 {
+		args = append(args, "-sa", strconv.Itoa(cfg.Saturation))
+	}
+	if cfg.Sharpness != 0 {
+		args = append(args, "-sh", strconv.Itoa(cfg.Sharpness))
+	}
+	if cfg.Width != 0 {
+		args = append(args, "-w", strconv.Itoa(cfg.Width))
+	}
+
+	cmd.Args = append(cmd.Args, args...)
+	return cmd
+
+}
+
 // NewPiCameraImplementation creates a new PiCamera Implementation
 func newPiCameraImplementation() (*PiCamera, error) {
-	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-", "-md", "7")
+	cmd := getPiCameraCmd()
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
