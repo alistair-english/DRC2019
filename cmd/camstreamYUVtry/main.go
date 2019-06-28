@@ -17,7 +17,7 @@ func main() {
 	width := 1920
 	height := 1080
 
-	cmd := exec.Command("raspividyuv", "-t", "0", "-o", "-") //, "-w", strconv.Itoa(width), "-h", strconv.Itoa(height))
+	cmd := exec.Command("raspividyuv", "-rgb", "-t", "0", "-o", "-") //, "-w", strconv.Itoa(width), "-h", strconv.Itoa(height))
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
@@ -35,28 +35,30 @@ func main() {
 
 	imgBuff := make([]byte, width*height) // read in stream
 
-	go func() {
+	// go func() {
+	func() {
 		for {
 			n, err := stdOut.Read(imgBuff)
 			if err != nil {
 				fmt.Println(err)
 			}
 			fmt.Println(n)
+			fmt.Println(imgBuff[:30])
 		}
 	}()
 
-	for {
-		if len(imgBuff) > 0 {
-			img, err := gocv.NewMatFromBytes(height, width, gocv.MatTypeCV8UC3, imgBuff)
-			if err != nil {
-				fmt.Println(err)
-			}
+	// for {
+	// 	if len(imgBuff) > 0 {
+	// 		img, err := gocv.NewMatFromBytes(height, width, gocv.MatTypeCV8UC3, imgBuff)
+	// 		if err != nil {
+	// 			fmt.Println(err)
+	// 		}
 
-			displayWindow.IMShow(img)
-			// displayWindow.WaitKey(1)
-			// fmt.Println(len(currImg))
-			// fmt.Println(img.Size())
-			img.Close()
-		}
-	}
+	// 		displayWindow.IMShow(img)
+	// 		// displayWindow.WaitKey(1)
+	// 		// fmt.Println(len(currImg))
+	// 		// fmt.Println(img.Size())
+	// 		img.Close()
+	// 	}
+	// }
 }
