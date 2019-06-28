@@ -20,7 +20,7 @@ func main() {
 	channels := 3
 	buffLen := width * height * channels
 
-	cmd := exec.Command("raspividyuv", "-rgb", "-t", "0", "-o", "-", "-w", strconv.Itoa(width), "-h", strconv.Itoa(height))
+	cmd := exec.Command("raspividyuv", "-t", "0", "-o", "-", "-w", strconv.Itoa(width), "-h", strconv.Itoa(height))
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
