@@ -13,7 +13,7 @@ var (
 )
 
 const (
-	STD_LOG = "std.log"
+	STD_LOG = "default.log"
 	PATH    = "/src/github.com/alistair-english/DRC2019/logs/"
 )
 
