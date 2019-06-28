@@ -54,11 +54,14 @@ func main() {
 
 			imgBuff.Write(readBuff[:numToWrite])
 
+			fmt.Println(imgBuff.Len())
+
 			if imgBuff.Len() >= buffLen {
 				copy(currImg, imgBuff.Bytes()[:buffLen])
 				imgBuff.Reset()
 				fmt.Println(len(currImg))
 				fmt.Println(currImg[:30])
+				fmt.Println(currImg[len(currImg)-30:])
 			}
 
 			imgBuff.Write(readBuff[numToWrite:])
