@@ -1,14 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 
+	"github.com/alistair-english/DRC2019/pkg/gohelpers"
 	"gocv.io/x/gocv"
 )
-
-var jpgStart = []byte{0xFF, 0xD8, 0xFF}
 
 func main() {
 	displayWindow := gocv.NewWindow("Display")
@@ -16,8 +17,10 @@ func main() {
 
 	width := 1920
 	height := 1080
+	channels := 3
+	buffLen := width * height * channels
 
-	cmd := exec.Command("raspividyuv", "-rgb", "-t", "0", "-o", "-") //, "-w", strconv.Itoa(width), "-h", strconv.Itoa(height))
+	cmd := exec.Command("raspividyuv", "-rgb", "-t", "0", "-o", "-", "-w", strconv.Itoa(width), "-h", strconv.Itoa(height))
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
@@ -33,17 +36,32 @@ func main() {
 
 	cmd.Stderr = os.Stderr
 
-	imgBuff := make([]byte, width*height*3) // read in stream
+	readBuff := make([]byte, width*height) // read in one 'img size' at a time (will take `channels` iterations to read full img)
+	imgBuff := new(bytes.Buffer)
+	currImg := make([]byte, buffLen)
 
 	// go func() {
 	func() {
 		for {
-			n, err := stdOut.Read(imgBuff)
+			n, err := stdOut.Read(readBuff)
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println(n)
-			fmt.Println(imgBuff[:30])
+
+			numLeftToRead := buffLen - imgBuff.Len()
+
+			numToWrite := gohelpers.IntMin(n, numLeftToRead)
+
+			imgBuff.Write(readBuff[:numToWrite])
+
+			if imgBuff.Len() >= buffLen {
+				copy(currImg, imgBuff.Bytes()[:buffLen])
+				imgBuff.Reset()
+				fmt.Println(len(currImg))
+				fmt.Println(currImg[:30])
+			}
+
+			imgBuff.Write(readBuff[numToWrite:])
 		}
 	}()
 

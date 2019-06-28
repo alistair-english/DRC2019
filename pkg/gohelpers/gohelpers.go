@@ -34,3 +34,11 @@ func DegToRad(deg float64) float64 {
 func RadToDeg(rad float64) float64 {
 	return rad * (180 / math.Pi)
 }
+
+// IntMin finds the minimum of two integers
+func IntMin(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
