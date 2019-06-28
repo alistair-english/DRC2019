@@ -33,7 +33,7 @@ func main() {
 
 	cmd.Stderr = os.Stderr
 
-	imgBuff := make([]byte, width*height) // read in stream
+	imgBuff := make([]byte, width*height*3) // read in stream
 
 	// go func() {
 	func() {
