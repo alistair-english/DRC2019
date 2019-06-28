@@ -75,10 +75,11 @@ func (l *logger) GetStream() Stream {
 }
 
 func (l *logger) ListStreams() {
-	fmt.Printf("Steam List:\n")
+	fmt.Printf("Stream List:\n[\n")
 	for i := range l.streamList {
-		fmt.Printf("%v", l.streamList[i])
+		fmt.Printf("%v\n", l.streamList[i].title)
 	}
+	fmt.Printf("]\n")
 }
 
 func (l *logger) Log(format string, v ...interface{}) {

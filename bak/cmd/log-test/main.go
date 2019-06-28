@@ -19,4 +19,6 @@ func main() {
 	log.Log("From the Logger! %v \n", 10)
 	// Log while outputting to stdio
 	log.LogOutln("This should log to terminal: %v", 69)
+	// List the current streams available
+	log.ListStreams()
 }
