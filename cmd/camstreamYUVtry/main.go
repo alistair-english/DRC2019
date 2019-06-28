@@ -73,9 +73,9 @@ func main() {
 			}
 
 			displayWindow.IMShow(img)
-			// displayWindow.WaitKey(1)
+			displayWindow.WaitKey(1)
 			// fmt.Println(len(currImg))
-			// fmt.Println(img.Size())
+			fmt.Println(img.Size())
 			img.Close()
 		}
 	}
