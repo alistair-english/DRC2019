@@ -1,9 +1,6 @@
 package main
 
 import (
-	"os"
-	"time"
-
 	"github.com/alistair-english/DRC2019/pkg/logging"
 )
 
@@ -17,13 +14,13 @@ func main() {
 	// Add the rpi-serial.log file stream with a title SERIAL_LOG
 	log.AddStream("rpi-serial.log", "SERIAL_LOG")
 	// Log to the default stream
-	log.Logln("Hello World! (in default)")
+	log.Logln(TAG, "Hello World! (in default)")
 	// Change stream
 	log.ChangeStream("SERIAL_LOG")
 	// Log to the new stream
-	log.Log("From the Logger! %v \n", 10)
+	log.Log(TAG, "From the Logger! %v \n", 10)
 	// Log while outputting to stdio
-	log.LogOutln("This should log to terminal: %v", 69)
+	log.LogOutln(TAG, "This should log to terminal: %v", 69)
 	// List the current streams available
 	log.ListStreams()
 }

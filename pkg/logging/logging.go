@@ -82,23 +82,23 @@ func (l *logger) ListStreams() {
 	fmt.Printf("]\n")
 }
 
-func (l *logger) Log(format string, v ...interface{}) {
+func (l *logger) Log(tag string, format string, v ...interface{}) {
 	// I would like to replace fmt.Sprintf with custom function but this will do
-	l.cStream.Write([]byte(fmt.Sprintf(format, v...)))
+	l.cStream.Write([]byte(fmt.Sprintf(tag+": "+format, v...)))
 }
 
 func (l *logger) Logln(tag string, format string, v ...interface{}) {
 	// I would like to replace fmt.Sprintf with custom function but this will do
-	l.cStream.Write([]byte(fmt.Sprintf(format+"\n", v...)))
+	l.cStream.Write([]byte(fmt.Sprintf(tag+": "+format+"\n", v...)))
 }
 
-func (l *logger) LogOut(format string, v ...interface{}) {
-	l.cStream.Write([]byte(fmt.Sprintf(format, v...)))
+func (l *logger) LogOut(tag string, format string, v ...interface{}) {
+	l.cStream.Write([]byte(fmt.Sprintf(tag+": "+format, v...)))
 	fmt.Printf(format, v...)
 }
 
-func (l *logger) LogOutln(format string, v ...interface{}) {
-	l.cStream.Write([]byte(fmt.Sprintf(format+"\n", v...)))
+func (l *logger) LogOutln(tag string, format string, v ...interface{}) {
+	l.cStream.Write([]byte(fmt.Sprintf(tag+": "+format+"\n", v...)))
 	fmt.Printf(format+"\n", v...)
 }
 
