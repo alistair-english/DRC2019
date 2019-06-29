@@ -2,6 +2,7 @@ package cvhelpers
 
 import (
 	"image"
+	"io/ioutil"
 	"sort"
 
 	"gocv.io/x/gocv"
@@ -50,6 +51,23 @@ func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) HSVMask {
 	gocv.Merge(maskChannels, &output)
 
 	return HSVMask(output)
+}
+
+// NewHSVMaskFromFile reads in HSVMask from file
+func NewHSVMaskFromFile(path string, channels int, rows int, cols int) (HSVMask, error) {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return HSVMask{}, err
+	}
+
+	mat, err := gocv.NewMatFromBytes(rows, cols, gocv.MatTypeCV8U, data)
+	return HSVMask(mat), err
+}
+
+// SaveHSVMaskToFile saves HSVMask to file
+func SaveHSVMaskToFile(mask HSVMask, path string) error {
+	mat := gocv.Mat(mask)
+	return ioutil.WriteFile(path, mat.ToBytes(), 0644)
 }
 
 // Contour is a contour
@@ -155,6 +173,8 @@ func findHSVObjectGroup(img gocv.Mat, objectGroup HSVObjectGroup, resultChan cha
 	// Threshold
 	mask := gocv.NewMatWithSize(img.Rows(), img.Cols(), gocv.MatTypeCV8U)
 	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 2, 2, &mask)
+
+	// TODO: morphological transformations on the mask to make it better
 
 	// Contours
 	contours := FindLargestContours(mask, objectGroup.NumToFind, objectGroup.MinArea)
