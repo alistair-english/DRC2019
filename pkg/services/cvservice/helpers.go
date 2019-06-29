@@ -46,7 +46,7 @@ func getObjectsFromConfig() []cvhelpers.HSVObjectGroup {
 	return objs
 }
 
-func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int) gocv.Mat {
+func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int) cvhelpers.HSVMask {
 	if cfg.Path != "" {
 		mask, err := cvhelpers.NewHSVMaskFromFile(cfg.Path, channels, rows, cols)
 		if err == nil {
