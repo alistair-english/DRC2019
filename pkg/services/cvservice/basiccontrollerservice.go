@@ -49,6 +49,13 @@ func (c *BasicControllerService) Start() {
 	go func() {
 		// Load Configurations
 		cvConfig := config.GetCVConfig()
+		controlConfig := config.GetControlPIDConfig()
+
+		// Create the pid controller and set limits / target
+		controlPID := pidctrl.NewPIDController(controlConfig.Pid.P, controlConfig.Pid.I, controlConfig.Pid.D)
+
+		controlPID.SetOutputLimits(-90.0, 90.0)
+		controlPID.Set(0.00)
 
 		// Image Mats
 		var sourceImg = gocv.NewMat()
@@ -192,6 +199,9 @@ func (c *BasicControllerService) Start() {
 
 			driveAngle := CartesianToDriveAngle(cartAngle)
 			// driveSpeed := int8((cartLen / diagonalLen) * 100)
+
+			tunedAngle := controlPID.Update(float64(driveAngle))
+			fmt.Printf("Corrected Angle: %v \n", tunedAngle)
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{
 				serialservice.Control{
