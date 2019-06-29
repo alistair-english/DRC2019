@@ -2,10 +2,11 @@ package logging
 
 import (
 	"fmt"
-	"github.com/alistair-english/DRC2019/pkg/services/seriallogservice"
 	"io"
 	"os"
 	"sync"
+
+	"github.com/alistair-english/DRC2019/pkg/services/seriallogservice"
 )
 
 var (
@@ -23,6 +24,7 @@ const (
 	LogFile   = 1
 	LogStd    = 2
 	LogSerial = 4
+	All       = LogFile | LogStd | LogSerial
 )
 
 // Stream contains a stream and title
@@ -125,4 +127,9 @@ func Logger() *logger {
 		l.streamList = []Stream{}
 	})
 	return l
+}
+
+// L is an alias to Logger to make more concise calls to logger
+func L() *logger {
+	return Logger()
 }
