@@ -20,6 +20,7 @@ func (g *GoCVCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 		cam.Read(req.Img)
 		select {
 		case req.ResponseChannel <- true:
+		default:
 		}
 	}
 }

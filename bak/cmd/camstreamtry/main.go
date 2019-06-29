@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 
 	"gocv.io/x/gocv"
 )
@@ -15,7 +17,18 @@ func main() {
 	// displayWindow := gocv.NewWindow("Display")
 	// defer displayWindow.Close()
 
-	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
+	widthPtr := flag.Int("w", -1, "width")
+	heightPtr := flag.Int("h", -1, "height")
+	flag.Parse()
+
+	var cmd *exec.Cmd
+	if *widthPtr != -1 && *heightPtr != -1 {
+		fmt.Println("w: ", *widthPtr, " h: ", *heightPtr)
+		cmd = exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-", "-w", strconv.Itoa(*widthPtr), "-h", strconv.Itoa(*heightPtr))
+	} else {
+		fmt.Println("no bois")
+		cmd = exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
+	}
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
@@ -70,6 +83,7 @@ func main() {
 
 						select {
 						case channel <- true:
+						default:
 						}
 
 						// reset the buffer
@@ -94,7 +108,10 @@ func main() {
 				fmt.Println(err)
 			}
 
-			fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
+			// fmt.Println(img.GetVeciAt(img.Cols()/2, img.Rows()/2))
+			fmt.Println(len(currImg))
+			fmt.Println(len(img.ToBytes()))
+			fmt.Println(img.Cols(), img.Rows())
 
 			// displayWindow.IMShow(img)
 			// displayWindow.WaitKey(1)

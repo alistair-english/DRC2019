@@ -18,7 +18,7 @@ func CartesianToDriveAngle(cartAngle float64) int8 {
 	if cartAngle <= 90 {
 		return int8(-(cartAngle - 90))
 	} else if cartAngle <= 180 {
-		return int8(cartAngle - 90)
+		return int8(90 - cartAngle)
 	} else {
 		return 0
 	}
