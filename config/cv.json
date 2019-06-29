@@ -11,12 +11,14 @@
             "lowerMask": {
                 "H": 105,
                 "S": 50,
-                "V": 50
+                "V": 50,
+                "path": "/some/path"
             },
             "upperMask": {
                 "H": 115,
                 "S": 255,
-                "V": 255
+                "V": 255,
+                "path": "/some/path"
             }
         },
 
@@ -27,12 +29,14 @@
             "lowerMask": {
                 "H": 10,
                 "S": 40,
-                "V": 90
+                "V": 90,
+                "path": "/some/path"
             },
             "upperMask": {
                 "H": 40,
                 "S": 255,
-                "V": 255
+                "V": 255,
+                "path": "/some/path"
             }
         }
     ]
