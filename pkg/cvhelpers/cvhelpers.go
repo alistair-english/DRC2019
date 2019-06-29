@@ -4,6 +4,7 @@ package cvhelpers
 
 import (
 	"image"
+	"sort"
 
 	"gocv.io/x/gocv"
 
@@ -50,22 +51,33 @@ func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) gocv.Mat {
 	return output
 }
 
-// FindLargestContour finds the largest contour in a binary image using some default settings and returns the countour
-func FindLargestContour(in gocv.Mat) []image.Point {
-	contours := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
+// Contour is a contour
+type Contour struct {
+	Points []image.Point
+	Area   float64
+}
 
-	if len(contours) == 0 {
-		return nil
+// FindLargestContours finds the num largest contours in a binary image using some default settings and returns the countours.
+// Will return less contours than num if it finds less.
+func FindLargestContours(in gocv.Mat, num int, minArea float64) []Contour {
+
+	result := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
+
+	// Cut out any contours under min area
+	var contours []Contour
+	for _, contourPoints := range result {
+		a := gocv.ContourArea(contourPoints)
+		if a >= minArea {
+			contours = append(contours, Contour{contourPoints, a})
+		}
 	}
 
-	var areas []float64
-	for _, contour := range contours {
-		areas = append(areas, gocv.ContourArea(contour))
-	}
+	// Sort descending by area
+	sort.Slice(contours, func(i, j int) bool {
+		return contours[i].Area > contours[j].Area
+	})
 
-	i, _ := gohelpers.MaxFloat64(areas)
-
-	return contours[i]
+	return contours[:gohelpers.IntMin(num, len(contours))]
 }
 
 // Thresholds is a struct that contains upper and lower colour bounds in the form of gocv.Scalar
@@ -85,6 +97,7 @@ type HSVObjectGroup struct {
 	Name      string
 	Masks     HSVMasks
 	NumToFind int
+	MinArea   float64
 }
 
 // HSVObject describes a found HSV object
@@ -101,7 +114,7 @@ type HSVObjectGroupResult struct {
 }
 
 // NewHSVObjectGroup creates a new cvhelpers.HSVObjectGroup
-func NewHSVObjectGroup(name string, lowerMask gocv.Mat, upperMask gocv.Mat, numToFind int) HSVObjectGroup {
+func NewHSVObjectGroup(name string, lowerMask gocv.Mat, upperMask gocv.Mat, numToFind int, minArea float64) HSVObjectGroup {
 	return HSVObjectGroup{
 		name,
 		HSVMasks{
@@ -109,10 +122,11 @@ func NewHSVObjectGroup(name string, lowerMask gocv.Mat, upperMask gocv.Mat, numT
 			upperMask,
 		},
 		numToFind,
+		minArea,
 	}
 }
 
-// FindHSVObjects finds all HSVObjects from a []cvhelpers.HSVObject in a given image
+// FindHSVObjects finds all HSVObjects from a []cvhelpers.HSVObjectGroup in a given image
 func FindHSVObjects(img gocv.Mat, objectGroups []HSVObjectGroup) []HSVObjectGroupResult {
 
 	tempMask := gocv.NewMat()
@@ -136,25 +150,30 @@ func FindHSVObjects(img gocv.Mat, objectGroups []HSVObjectGroup) []HSVObjectGrou
 }
 
 func findHSVObjectGroup(img gocv.Mat, objectGroup HSVObjectGroup, resultChan chan<- HSVObjectGroupResult) {
-	/// Find the object
+
+	// Threshold
 	mask := gocv.NewMatWithSize(img.Rows(), img.Cols(), gocv.MatTypeCV8U)
 	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 2, 2, &mask)
 
-	// Apply any user processing
-	// processMask(tempMask, &tempMask)
+	// Contours
+	contours := FindLargestContours(mask, objectGroup.NumToFind, objectGroup.MinArea)
 
-	// // Find the largest contour
-	// contour := FindLargestContour(tempMask)
-	// results[i].Countour = contour
+	// HSV Objects
+	objects := make([]HSVObject, len(contours))
 
-	// // Find the bounding box
-	// if contour != nil {
-	// 	results[i].BoundingBox = gocv.BoundingRect(contour)
-	// 	results[i].Area = gocv.ContourArea(contour)
-	// }
+	for i, contour := range contours {
+		objects[i] = HSVObject{
+			Countour:    contour.Points,
+			BoundingBox: gocv.BoundingRect(contour.Points),
+			Area:        contour.Area,
+		}
+	}
 
-	// // Copy the name
-	// results[i].Name = obj.Name
+	// Result
+	resultChan <- HSVObjectGroupResult{
+		Name:    objectGroup.Name,
+		Objects: objects,
+	}
 }
 
 // InRangeBySegments runs InRange gocv function by splitting the image into segments and calculating concurrently
