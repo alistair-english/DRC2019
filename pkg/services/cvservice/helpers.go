@@ -52,9 +52,7 @@ func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int
 		if err != nil {
 			return mask
 		}
-		logging.L().Logln(
-			TAG,
-			logging.All,
+		logging.L().Logln(TAG, logging.All,
 			"newMaskFromConfig - WARNING: error creating mask from file for %v (%v) from file. Defaulting to calcs.\n"+err.Error(), cfg, objName)
 	}
 
