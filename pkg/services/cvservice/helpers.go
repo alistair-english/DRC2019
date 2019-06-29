@@ -49,7 +49,7 @@ func getObjectsFromConfig() []cvhelpers.HSVObjectGroup {
 func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int) gocv.Mat {
 	if cfg.Path != "" {
 		mask, err := cvhelpers.NewHSVMaskFromFile(cfg.Path, channels, rows, cols)
-		if err != nil {
+		if err == nil {
 			return mask
 		}
 		logging.L().Logln(TAG, logging.All,
