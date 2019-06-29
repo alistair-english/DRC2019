@@ -10,6 +10,8 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/gohelpers"
 )
 
+const TAG = "CV_HELPERS"
+
 // ReadHSV will read in an image from the supplied VideoCapture and output a HSV file to dst
 func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
 	tempMat := gocv.NewMat()
@@ -78,62 +80,118 @@ type HSVMasks struct {
 	Upper gocv.Mat
 }
 
-// HSVObject describes an object with a name and a HSV masks
-type HSVObject struct {
-	Name  string
-	Masks HSVMasks
+// HSVObjectGroup describes an object with a name and a HSV masks
+type HSVObjectGroup struct {
+	Name      string
+	Masks     HSVMasks
+	NumToFind int
 }
 
-// HSVObjectResult describes an object found with cvhelpers.FindHSVObjects
-type HSVObjectResult struct {
-	Name        string
+// HSVObject describes a found HSV object
+type HSVObject struct {
 	Countour    []image.Point
 	BoundingBox image.Rectangle
 	Area        float64
 }
 
-// ImageMod is a function to be defined by the user to do some specific processing to a given src image gocv.Mat and output it to dst
-type ImageMod func(src gocv.Mat, dst *gocv.Mat)
+// HSVObjectGroupResult describes a group of objects found with cvhelpers.FindHSVObjects
+type HSVObjectGroupResult struct {
+	Name    string
+	Objects []HSVObject
+}
 
-// NewHSVObject creates a new cvhelpers.HSVObject
-func NewHSVObject(name string, lowerMask gocv.Mat, upperMask gocv.Mat) HSVObject {
-	return HSVObject{
+// NewHSVObjectGroup creates a new cvhelpers.HSVObjectGroup
+func NewHSVObjectGroup(name string, lowerMask gocv.Mat, upperMask gocv.Mat, numToFind int) HSVObjectGroup {
+	return HSVObjectGroup{
 		name,
 		HSVMasks{
 			lowerMask,
 			upperMask,
 		},
+		numToFind,
 	}
 }
 
 // FindHSVObjects finds all HSVObjects from a []cvhelpers.HSVObject in a given image
-func FindHSVObjects(img gocv.Mat, objects []HSVObject, processMask ImageMod) []HSVObjectResult {
+func FindHSVObjects(img gocv.Mat, objectGroups []HSVObjectGroup) []HSVObjectGroupResult {
 
 	tempMask := gocv.NewMat()
 	defer tempMask.Close()
 
-	results := make([]HSVObjectResult, len(objects))
+	results := make([]HSVObjectGroupResult, len(objectGroups))
 
-	for i, obj := range objects {
-		// Find the object
-		gocv.InRange(img, obj.Masks.Lower, obj.Masks.Upper, &tempMask)
+	resultChan := make(chan HSVObjectGroupResult, len(objectGroups))
 
-		// Apply any user processing
-		processMask(tempMask, &tempMask)
+	// Spawn goroutines to find all the objects
+	for _, group := range objectGroups {
+		go findHSVObjectGroup(img, group, resultChan)
+	}
 
-		// Find the largest contour
-		contour := FindLargestContour(tempMask)
-		results[i].Countour = contour
-
-		// Find the bounding box
-		if contour != nil {
-			results[i].BoundingBox = gocv.BoundingRect(contour)
-			results[i].Area = gocv.ContourArea(contour)
-		}
-
-		// Copy the name
-		results[i].Name = obj.Name
+	// Now wait for the results and pull them out of the channel
+	for i := 0; i < len(objectGroups); i++ {
+		results[i] = <-resultChan
 	}
 
 	return results
+}
+
+func findHSVObjectGroup(img gocv.Mat, objectGroup HSVObjectGroup, resultChan chan<- HSVObjectGroupResult) {
+	/// Find the object
+	mask := gocv.NewMatWithSize(img.Rows(), img.Cols(), gocv.MatTypeCV8U)
+	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 2, 2, &mask)
+
+	// Apply any user processing
+	// processMask(tempMask, &tempMask)
+
+	// // Find the largest contour
+	// contour := FindLargestContour(tempMask)
+	// results[i].Countour = contour
+
+	// // Find the bounding box
+	// if contour != nil {
+	// 	results[i].BoundingBox = gocv.BoundingRect(contour)
+	// 	results[i].Area = gocv.ContourArea(contour)
+	// }
+
+	// // Copy the name
+	// results[i].Name = obj.Name
+}
+
+// InRangeBySegments runs InRange gocv function by splitting the image into segments and calculating concurrently
+func InRangeBySegments(img, lowerMask, upperMask gocv.Mat, numSegHor, numSegVert int, dst *gocv.Mat) {
+	if img.Rows() != dst.Rows() || img.Cols() != dst.Cols() {
+		// this should throw error
+	}
+
+	// dst must be same size as img and of type MatTypeCV8U
+	segWidth := img.Cols() / numSegHor
+	segHeight := img.Rows() / numSegVert
+
+	doneChan := make(chan bool, segWidth*segHeight)
+
+	// Spawn a bunch of inrange go routines acting on segments on the image
+	for r := 0; r < numSegVert; r++ {
+		for c := 0; c < numSegHor; c++ {
+			seg := image.Rect(
+				c*segWidth,      // xMin
+				r*segHeight,     // yMin
+				(c+1)*segWidth,  // xMax
+				(r+1)*segHeight, // yMax
+			)
+
+			sourceSeg := img.Region(seg)
+			destSeg := dst.Region(seg)
+			go func() {
+				gocv.InRange(sourceSeg, lowerMask.Region(seg), upperMask.Region(seg), &destSeg)
+				doneChan <- true
+			}()
+		}
+	}
+
+	for r := 0; r < numSegVert; r++ {
+		for c := 0; c < numSegHor; c++ {
+			<-doneChan
+		}
+	}
+
 }
