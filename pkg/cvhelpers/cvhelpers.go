@@ -1,7 +1,5 @@
 package cvhelpers
 
-//TODO: Move this package to internal
-
 import (
 	"image"
 	"sort"
