@@ -20,8 +20,11 @@ func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
 	gocv.CvtColor(tempMat, dst, gocv.ColorBGRToHSV)
 }
 
+// HSVMask is a HSV mask (duh)
+type HSVMask gocv.Mat
+
 // NewHSVMask creates a HSV mask that can be used in gocv.InRange
-func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) gocv.Mat {
+func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) HSVMask {
 
 	source := gocv.NewMatFromScalar(in, gocv.MatTypeCV8UC3)
 	defer source.Close()
@@ -46,7 +49,7 @@ func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) gocv.Mat {
 
 	gocv.Merge(maskChannels, &output)
 
-	return output
+	return HSVMask(output)
 }
 
 // Contour is a contour
@@ -86,8 +89,8 @@ type Thresholds struct {
 
 // HSVMasks is a struct that contains upper and lower HSV masks that can be generated with cvhelpers.HSVMask
 type HSVMasks struct {
-	Lower gocv.Mat
-	Upper gocv.Mat
+	Lower HSVMask
+	Upper HSVMask
 }
 
 // HSVObjectGroup describes an object with a name and a HSV masks
@@ -112,7 +115,7 @@ type HSVObjectGroupResult struct {
 }
 
 // NewHSVObjectGroup creates a new cvhelpers.HSVObjectGroup
-func NewHSVObjectGroup(name string, lowerMask gocv.Mat, upperMask gocv.Mat, numToFind int, minArea float64) HSVObjectGroup {
+func NewHSVObjectGroup(name string, lowerMask HSVMask, upperMask HSVMask, numToFind int, minArea float64) HSVObjectGroup {
 	return HSVObjectGroup{
 		name,
 		HSVMasks{
@@ -175,7 +178,7 @@ func findHSVObjectGroup(img gocv.Mat, objectGroup HSVObjectGroup, resultChan cha
 }
 
 // InRangeBySegments runs InRange gocv function by splitting the image into segments and calculating concurrently
-func InRangeBySegments(img, lowerMask, upperMask gocv.Mat, numSegHor, numSegVert int, dst *gocv.Mat) {
+func InRangeBySegments(img gocv.Mat, lowerMask, upperMask HSVMask, numSegHor, numSegVert int, dst *gocv.Mat) {
 	if img.Rows() != dst.Rows() || img.Cols() != dst.Cols() {
 		// this should throw error
 	}
@@ -198,8 +201,11 @@ func InRangeBySegments(img, lowerMask, upperMask gocv.Mat, numSegHor, numSegVert
 
 			sourceSeg := img.Region(seg)
 			destSeg := dst.Region(seg)
+			lowerMaskMat := gocv.Mat(lowerMask)
+			upperMaskMat := gocv.Mat(upperMask)
+
 			go func() {
-				gocv.InRange(sourceSeg, lowerMask.Region(seg), upperMask.Region(seg), &destSeg)
+				gocv.InRange(sourceSeg, lowerMaskMat.Region(seg), upperMaskMat.Region(seg), &destSeg)
 				doneChan <- true
 			}()
 		}
