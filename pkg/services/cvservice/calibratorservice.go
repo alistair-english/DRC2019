@@ -3,6 +3,7 @@ package cvservice
 import (
 	"reflect"
 
+	"github.com/alistair-english/DRC2019/pkg/config"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
@@ -61,10 +62,13 @@ func (c *CalibratorService) Start() {
 			upperV = sliderWindow.CreateTrackbar("Upper V", 255)
 		)
 
+		// Config
+		cvConfig := config.GetCVConfig()
+
 		var (
 			sourceImg = gocv.NewMat()
 			hsvImg    = gocv.NewMat()
-			threshImg = gocv.NewMat()
+			threshImg = gocv.NewMatWithSize(cvConfig.ImgHeight, cvConfig.ImgWidth, gocv.MatTypeCV8U)
 		)
 
 		// Image closes
@@ -75,15 +79,6 @@ func (c *CalibratorService) Start() {
 		// Img request setup
 		imgReadChannel := make(chan bool, 1)
 
-		// Get an image
-		getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
-
-		// Convert to HSV
-		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
-
-		// Calculate our HSV masks
-		channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
-
 		var (
 			lowerMask = cvhelpers.NewHSVMask(
 				gocv.NewScalar(
@@ -92,9 +87,9 @@ func (c *CalibratorService) Start() {
 					0,
 					0.0,
 				),
-				channels,
-				rows,
-				cols,
+				cvConfig.ImgChannels,
+				cvConfig.ImgHeight,
+				cvConfig.ImgWidth,
 			)
 
 			upperMask = cvhelpers.NewHSVMask(
@@ -104,9 +99,9 @@ func (c *CalibratorService) Start() {
 					0,
 					0.0,
 				),
-				channels,
-				rows,
-				cols,
+				cvConfig.ImgChannels,
+				cvConfig.ImgHeight,
+				cvConfig.ImgWidth,
 			)
 		)
 
@@ -134,21 +129,23 @@ func (c *CalibratorService) Start() {
 				upperV,
 			)
 
-			// Wait for space
+			// Wait for enter
 			key := displayWindow.WaitKey(500)
 			if key == 13 {
 				if lowerHSV != prevLowerHSV || upperHSV != prevUpperHSV {
 					lowerMask = cvhelpers.NewHSVMask(
 						lowerHSV,
-						channels,
-						rows,
-						cols)
+						cvConfig.ImgChannels,
+						cvConfig.ImgHeight,
+						cvConfig.ImgWidth,
+					)
 
 					upperMask = cvhelpers.NewHSVMask(
 						upperHSV,
-						channels,
-						rows,
-						cols)
+						cvConfig.ImgChannels,
+						cvConfig.ImgHeight,
+						cvConfig.ImgWidth,
+					)
 
 					prevLowerHSV = lowerHSV
 					prevUpperHSV = upperHSV
@@ -159,7 +156,7 @@ func (c *CalibratorService) Start() {
 			gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 
 			// Calculate threshold
-			gocv.InRange(hsvImg, gocv.Mat(lowerMask), gocv.Mat(upperMask), &threshImg)
+			cvhelpers.InRangeBySegments(hsvImg, lowerMask, upperMask, 2, 2, &threshImg)
 
 			// Display Images
 			displayWindow.IMShow(threshImg)

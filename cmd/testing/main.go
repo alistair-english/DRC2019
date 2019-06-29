@@ -69,7 +69,7 @@ func main() {
 	serLogService.Start()
 	log.Logln("", logging.All, "Done.")
 
-	log.AddSerialLogService(serLogService)
+	// log.AddSerialLogService(serLogService)
 
 	log.Logln(TAG, logging.All, "Starting Router (blocking)")
 	// router is blocking
