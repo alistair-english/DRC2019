@@ -14,14 +14,6 @@ const (
 	SerialSync2      = 255 // Filler
 )
 
-// Header is the header information for the serial comms
-type Header struct {
-	Sync1 uint8
-	Sync2 uint8
-	Type  uint8
-	Size  uint8
-}
-
 //Implementation is the interface for serial
 type Implementation interface {
 	RunSerialTx(writeChan <-chan []byte) error

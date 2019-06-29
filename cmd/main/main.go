@@ -6,7 +6,10 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
 	"github.com/alistair-english/DRC2019/pkg/services/cvservice"
+	"github.com/alistair-english/DRC2019/pkg/services/seriallogservice"
 	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
+
+	"github.com/alistair-english/DRC2019/pkg/logging"
 )
 
 func main() {
@@ -32,10 +35,15 @@ func main() {
 	ctrlService := &cvservice.BasicControllerService{}
 	fmt.Println("Done.")
 
+	fmt.Print("Getting serial log...")
+	serLogService := seriallogservice.NewSerialLogService()
+	fmt.Println("Done.")
+
 	fmt.Print("Registering services... ")
 	router.Register(serService)
 	router.Register(camService)
 	router.Register(ctrlService)
+	router.Register(serLogService)
 	fmt.Println("Done.")
 
 	fmt.Print("Starting Serial... ")
@@ -46,8 +54,17 @@ func main() {
 	camService.Start()
 	fmt.Println("Done.")
 
-	fmt.Println("Starting Controller... ")
+	fmt.Print("Starting Controller... ")
 	ctrlService.Start()
+	fmt.Println("Done.")
+
+	fmt.Print("Starting SerLog... ")
+	serLogService.Start()
+	fmt.Println("Done.")
+
+	fmt.Print("Starting Logger... ")
+	log := logging.Logger()
+	log.Init(serLogService)
 	fmt.Println("Done.")
 
 	fmt.Println("Starting Router (blocking)")

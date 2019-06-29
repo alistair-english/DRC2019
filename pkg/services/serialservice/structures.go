@@ -34,3 +34,11 @@ type PowerReqResponse struct {
 type LogMessage struct {
 	Msg string
 }
+
+// Header is the header information for the serial comms
+type Header struct {
+	Sync1 uint8
+	Sync2 uint8
+	Type  uint8
+	Size  uint8
+}

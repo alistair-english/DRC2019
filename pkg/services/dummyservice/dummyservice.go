@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"reflect"
 
-	"gocv.io/x/gocv"
+	// "gocv.io/x/gocv"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
-	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
-	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
+	// "github.com/alistair-english/DRC2019/pkg/services/cameraservice"
+	// "github.com/alistair-english/DRC2019/pkg/services/serialservice"
+
+	"github.com/alistair-english/DRC2019/pkg/logging"
 )
 
 type DummyServiceA struct {
@@ -20,20 +22,27 @@ func NewDummyServiceA() *DummyServiceA {
 }
 
 func (d *DummyServiceA) Start() {
+	// go func() {
+	// 	chann := make(chan bool, 1)
+	// 	img := gocv.NewMat()
+	// 	defer img.Close()
+
+	// 	displayWindow := gocv.NewWindow("Display")
+	// 	defer displayWindow.Close()
+
+	// 	for {
+	// 		d.actionRequestChannel <- cameraservice.GetImageActionReq{&img, chann}
+	// 		<-chann
+	// 		displayWindow.IMShow(img)
+	// 		displayWindow.WaitKey(1)
+	// 		d.actionRequestChannel <- serialservice.SerialSendActionReq{serialservice.Control{50, 50}}
+	// 	}
+	// }()
+
 	go func() {
-		chann := make(chan bool, 1)
-		img := gocv.NewMat()
-		defer img.Close()
-
-		displayWindow := gocv.NewWindow("Display")
-		defer displayWindow.Close()
-
+		log := logging.Logger()
 		for {
-			d.actionRequestChannel <- cameraservice.GetImageActionReq{&img, chann}
-			<-chann
-			displayWindow.IMShow(img)
-			displayWindow.WaitKey(1)
-			d.actionRequestChannel <- serialservice.SerialSendActionReq{serialservice.Control{50, 50}}
+			log.Logln("TEST", logging.LogSerial, "Hello from DSA")
 		}
 	}()
 }
