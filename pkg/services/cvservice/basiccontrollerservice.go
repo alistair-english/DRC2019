@@ -44,7 +44,7 @@ const (
 func (c *BasicControllerService) Start() {
 	go func() {
 		// Load Configurations
-		cvConfig := config.GetCVConfig()
+		// cvConfig := config.GetCVConfig()
 		controlConfig := config.GetControlPIDConfig()
 
 		// Create the pid controller and set limits / target

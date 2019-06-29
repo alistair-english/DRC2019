@@ -44,7 +44,7 @@ type logger struct {
 	serLog     *seriallogservice.SerialLogService
 }
 
-func (l *logger) Init(serLog *seriallogservice.SerialLogService) {
+func (l *logger) Init() {
 	// Inits on a default stream :)
 	l.AddStream(stdLog, "DEFAULT_LOG")
 	l.cTitle = l.streamList[0].title
@@ -101,27 +101,33 @@ func (l *logger) ListStreams() {
 
 func (l *logger) Log(tag string, flags int, format string, v ...interface{}) {
 	// I would like to replace fmt.Sprintf with custom function but this will do
+	if tag != "" {
+		tag = tag + ": "
+	}
 	if (flags & LogFile) != 0 {
-		l.cStream.Write([]byte(fmt.Sprintf(tag+": "+format, v...)))
+		l.cStream.Write([]byte(fmt.Sprintf(tag+format, v...)))
 	}
 	if (flags & LogStd) != 0 {
-		fmt.Printf(tag+": "+format, v...)
+		fmt.Printf(tag+format, v...)
 	}
 	if (flags&LogSerial) != 0 && l.serLog != nil {
-		l.serLog.LogToSerial(fmt.Sprintf(tag+": "+format, v...))
+		l.serLog.LogToSerial(fmt.Sprintf(tag+format, v...))
 	}
 }
 
 func (l *logger) Logln(tag string, flags int, format string, v ...interface{}) {
 	// I would like to replace fmt.Sprintf with custom function but this will do
+	if tag != "" {
+		tag = tag + ": "
+	}
 	if (flags & LogFile) != 0 {
-		l.cStream.Write([]byte(fmt.Sprintf(tag+": "+format+"\n", v...)))
+		l.cStream.Write([]byte(fmt.Sprintf(tag+format+"\n", v...)))
 	}
 	if (flags & LogStd) != 0 {
-		fmt.Printf(tag+": "+format+"\n", v...)
+		fmt.Printf(tag+format+"\n", v...)
 	}
 	if (flags&LogSerial) != 0 && l.serLog != nil {
-		l.serLog.LogToSerial(fmt.Sprintf(tag+": "+format+"\n", v...))
+		l.serLog.LogToSerial(fmt.Sprintf(tag+format+"\n", v...))
 	}
 }
 

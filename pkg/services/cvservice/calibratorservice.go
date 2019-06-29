@@ -159,7 +159,7 @@ func (c *CalibratorService) Start() {
 			gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 
 			// Calculate threshold
-			gocv.InRange(hsvImg, lowerMask, upperMask, &threshImg)
+			gocv.InRange(hsvImg, gocv.Mat(lowerMask), gocv.Mat(upperMask), &threshImg)
 
 			// Display Images
 			displayWindow.IMShow(threshImg)

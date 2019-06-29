@@ -17,61 +17,61 @@ const TAG = "MAIN"
 func main() {
 	router := arch.NewRouter()
 
-	fmt.Print("Getting Logger... ")
+	fmt.Println("Getting Logger... ")
 	log := logging.Logger()
 	log.Init()
 	fmt.Println("Done.")
 
-	log.Print(TAG, logging.All, "Getting serial... ")
+	log.Log(TAG, logging.All, "Getting serial... ")
 	serService, err := serialservice.NewPiSerial()
 	if err != nil {
-		fmt.Println(err)
+		log.Logln("", logging.All, err.Error())
 		return
 	}
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Getting camera... ")
+	log.Log(TAG, logging.All, "Getting camera... ")
 	camService, err := cameraservice.NewPiCamera()
 	if err != nil {
-		fmt.Println(err)
+		log.Logln("", logging.All, err.Error())
 		return
 	}
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Getting controller... ")
+	log.Log(TAG, logging.All, "Getting controller... ")
 	ctrlService := &cvservice.BasicControllerService{}
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Getting serial log...")
+	log.Log(TAG, logging.All, "Getting serial log...")
 	serLogService := seriallogservice.NewSerialLogService()
-	log.Print(TAG, logging.All, "Done.")
+	log.Log("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Registering services... ")
+	log.Log(TAG, logging.All, "Registering services... ")
 	router.Register(serService)
 	router.Register(camService)
 	router.Register(ctrlService)
 	router.Register(serLogService)
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Starting Serial... ")
+	log.Log(TAG, logging.All, "Starting Serial... ")
 	serService.Start()
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Staring Camera... ")
+	log.Log(TAG, logging.All, "Staring Camera... ")
 	camService.Start()
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Starting Controller... ")
+	log.Log(TAG, logging.All, "Starting Controller... ")
 	ctrlService.Start()
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.Print(TAG, logging.All, "Starting SerLog... ")
+	log.Log(TAG, logging.All, "Starting SerLog... ")
 	serLogService.Start()
-	log.Println(TAG, logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
-	log.AddSerialLogService(&serLogService)
+	log.AddSerialLogService(serLogService)
 
-	log.Println(TAG, logging.All, "Starting Router (blocking)")
+	log.Logln(TAG, logging.All, "Starting Router (blocking)")
 	// router is blocking
 	router.Start()
 }

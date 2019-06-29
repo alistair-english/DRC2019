@@ -43,6 +43,7 @@ func getObjectsFromConfig() []cvhelpers.HSVObjectGroup {
 			obj.MinArea,
 		)
 	}
+	return objs
 }
 
 func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int) cvhelpers.HSVMask {
@@ -51,10 +52,10 @@ func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int
 		if err != nil {
 			return mask
 		}
-		logging.L().Println(
+		logging.L().Logln(
 			TAG,
-			logger.All,
-			"newMaskFromConfig - WARNING: error creating mask from file for %v (%v) from file. Defaulting to calcs.\n"+err, cfg, objName)
+			logging.All,
+			"newMaskFromConfig - WARNING: error creating mask from file for %v (%v) from file. Defaulting to calcs.\n"+err.Error(), cfg, objName)
 	}
 
 	return cvhelpers.NewHSVMask(
@@ -63,5 +64,4 @@ func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int
 		rows,
 		cols,
 	)
-
 }
