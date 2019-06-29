@@ -12,12 +12,22 @@ type HSV struct {
 	V float64 `json:"V"`
 }
 
+// Object is the HSV config for an object
+type Object struct {
+	Name      string  `json:"name"`
+	NumToFind int     `json:"numToFind"`
+	MinArea   float64 `json:"minArea"`
+	UpperMask HSV     `json:"upperMask"`
+	LowerMask HSV     `json:"lowerMask"`
+}
+
 //CVConfig is the datatype for the CV information
 type CVConfig struct {
-	LeftLower  HSV `json:"leftLower"`
-	LeftUpper  HSV `json:"leftUpper"`
-	RightLower HSV `json:"rightLower"`
-	RightUpper HSV `json:"rightUpper"`
+	ImgWidth    int `json:"imgWidth"`
+	ImgHeight   int `json:"imgHeight"`
+	ImgChannels int `json:"imgChannels"`
+
+	Objects []Object `json:"objects"`
 }
 
 // GetCVConfig gets the CV configuration information from a json file

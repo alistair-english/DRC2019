@@ -60,7 +60,7 @@ func NewHSVMaskFromFile(path string, channels int, rows int, cols int) (HSVMask,
 		return HSVMask{}, err
 	}
 
-	mat, err := gocv.NewMatFromBytes(rows, cols, gocv.MatTypeCV8U, data)
+	mat, err := gocv.NewMatFromBytes(rows, cols, gocv.MatTypeCV8UC3, data)
 	return HSVMask(mat), err
 }
 

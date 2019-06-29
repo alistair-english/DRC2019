@@ -1,25 +1,39 @@
 {
-    "leftLower": {
-        "H": 105,
-        "S": 50,
-        "V": 50
-    },
+    "imgWidth": 1920,
+    "imgHeight": 1080,
+    "imgChannels": 3,
 
-    "leftUpper": {
-        "H": 115,
-        "S": 255,
-        "V": 255
-    },
+    "objects": [
+        {
+            "name": "LEFT_LINE",
+            "numToFind": 1,
+            "minArea": 1000,
+            "lowerMask": {
+                "H": 105,
+                "S": 50,
+                "V": 50
+            },
+            "upperMask": {
+                "H": 115,
+                "S": 255,
+                "V": 255
+            }
+        },
 
-    "rightLower": {
-        "H": 10,
-        "S": 40,
-        "V": 90
-    },
-
-    "rightUpper": {
-        "H": 40,
-        "S": 255,
-        "V": 255
-    }
+        {
+            "name": "RIGHT_LINE",
+            "numToFind": 1,
+            "minArea": 1000,
+            "lowerMask": {
+                "H": 10,
+                "S": 40,
+                "V": 90
+            },
+            "upperMask": {
+                "H": 40,
+                "S": 255,
+                "V": 255
+            }
+        }
+    ]
 }

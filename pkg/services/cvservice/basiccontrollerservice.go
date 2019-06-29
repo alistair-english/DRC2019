@@ -50,29 +50,22 @@ func (c *BasicControllerService) Start() {
 		// Load Configurations
 		cvConfig := config.GetCVConfig()
 
-		// displayWindow := gocv.NewWindow("Display")
-		// defer displayWindow.Close()
-
 		// Image Mats
-		var (
-			sourceImg = gocv.NewMat()
-			hsvImg    = gocv.NewMat()
-		)
-
-		// Image closes
+		var sourceImg = gocv.NewMat()
 		defer sourceImg.Close()
+		var hsvImg = gocv.NewMat()
 		defer hsvImg.Close()
 
 		// Img Read Channel
 		imgReadChannel := make(chan bool, 1)
 
+		// 
 		getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
 		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 
 		// Calculate our HSV masks
 		channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
-		// diagonalLen := math.Sqrt(math.Pow(float64(rows), 2) + math.Pow(float64(cols)/2, 2))
 
 		var processMask cvhelpers.ImageMod = func(src gocv.Mat, dst *gocv.Mat) {
 			// Blur the mask
