@@ -27,6 +27,8 @@ const (
 	All       = LogFile | LogStd | LogSerial
 )
 
+const TAG = "LOGGER"
+
 // Stream contains a stream and title
 type Stream struct {
 	stream io.Writer
@@ -49,7 +51,11 @@ func (l *logger) Init(serLog *seriallogservice.SerialLogService) {
 	l.cStream = l.streamList[0].stream
 	l.cIndex = 0
 	l.ChangeStream("DEFAULT_LOG")
+}
+
+func (l *logger) AddSerialLogService(serLog *seriallogservice.SerialLogService) {
 	l.serLog = serLog
+	l.Logln(TAG, All, "Got Serial Log Service!")
 }
 
 func (l *logger) AddStream(fileName string, title string) {
@@ -66,13 +72,12 @@ func (l *logger) AddStream(fileName string, title string) {
 func (l *logger) ChangeStream(title string) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	fmt.Printf("Changing Log Stream: [%v -> %v] \n", l.cTitle, title)
-	l.Logln("---Changing Log Stream: [%v -> %v]---", LogFile, l.cTitle, title)
+	l.Logln(TAG, All, "---Changing Log Stream: [%v -> %v]---", l.cTitle, title)
 	for i := range l.streamList {
 		if l.streamList[i].title == title {
 			l.cStream = l.streamList[i].stream
 			if title != l.cTitle {
-				l.Logln("---Changing Log Stream: [%v -> %v]---", LogFile, l.cTitle, title)
+				l.Logln(TAG, All, "---Changing Log Stream: [%v -> %v]---", l.cTitle, title)
 			}
 			l.cTitle = l.streamList[i].title
 			l.cIndex = i
@@ -102,7 +107,7 @@ func (l *logger) Log(tag string, flags int, format string, v ...interface{}) {
 	if (flags & LogStd) != 0 {
 		fmt.Printf(tag+": "+format, v...)
 	}
-	if (flags & LogSerial) != 0 {
+	if (flags&LogSerial) != 0 && l.serLog != nil {
 		l.serLog.LogToSerial(fmt.Sprintf(tag+": "+format, v...))
 	}
 }
@@ -115,7 +120,7 @@ func (l *logger) Logln(tag string, flags int, format string, v ...interface{}) {
 	if (flags & LogStd) != 0 {
 		fmt.Printf(tag+": "+format+"\n", v...)
 	}
-	if (flags & LogSerial) != 0 {
+	if (flags&LogSerial) != 0 && l.serLog != nil {
 		l.serLog.LogToSerial(fmt.Sprintf(tag+": "+format+"\n", v...))
 	}
 }
