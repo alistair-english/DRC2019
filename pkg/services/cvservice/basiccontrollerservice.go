@@ -14,6 +14,8 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/config"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
 	"gocv.io/x/gocv"
+
+	"github.com/felixge/pidctrl"
 )
 
 // BasicControllerService provides recording service
