@@ -21,44 +21,49 @@ type PiCamera struct {
 }
 
 func getPiCameraCmd() *exec.Cmd {
-	cfg := config.GetPiCameraConfig()
+	piCfg := config.GetPiCameraConfig()
+	cvCfg := config.GetCVConfig()
+
 	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
+
 	var args []string
-	if cfg.AWB != "" {
-		args = append(args, "-awb", cfg.AWB)
+
+	if cvCfg.ImgHeight != 0 {
+		args = append(args, "-h", strconv.Itoa(cvCfg.ImgHeight))
 	}
-	if cfg.Bitrate != 0 {
-		args = append(args, "-b", strconv.Itoa(cfg.Bitrate))
+	if cvCfg.ImgWidth != 0 {
+		args = append(args, "-w", strconv.Itoa(cvCfg.ImgWidth))
 	}
-	if cfg.Brightness != 0 {
-		args = append(args, "-br", strconv.Itoa(cfg.Brightness))
+
+	if piCfg.AWB != "" {
+		args = append(args, "-awb", piCfg.AWB)
 	}
-	if cfg.Contrast != 0 {
-		args = append(args, "-co", strconv.Itoa(cfg.Contrast))
+	if piCfg.Bitrate != 0 {
+		args = append(args, "-b", strconv.Itoa(piCfg.Bitrate))
 	}
-	if cfg.Exposure != "" {
-		args = append(args, "-ex", cfg.Exposure)
+	if piCfg.Brightness != 0 {
+		args = append(args, "-br", strconv.Itoa(piCfg.Brightness))
 	}
-	if cfg.FPS != 0 {
-		args = append(args, "-fps", strconv.Itoa(cfg.FPS))
+	if piCfg.Contrast != 0 {
+		args = append(args, "-co", strconv.Itoa(piCfg.Contrast))
 	}
-	if cfg.Height != 0 {
-		args = append(args, "-h", strconv.Itoa(cfg.Height))
+	if piCfg.Exposure != "" {
+		args = append(args, "-ex", piCfg.Exposure)
 	}
-	if cfg.Mode != 0 {
-		args = append(args, "-md", strconv.Itoa(cfg.Mode))
+	if piCfg.FPS != 0 {
+		args = append(args, "-fps", strconv.Itoa(piCfg.FPS))
 	}
-	if cfg.ROI != "" {
-		args = append(args, "-roi", cfg.ROI)
+	if piCfg.Mode != 0 {
+		args = append(args, "-md", strconv.Itoa(piCfg.Mode))
 	}
-	if cfg.Saturation != 0 {
-		args = append(args, "-sa", strconv.Itoa(cfg.Saturation))
+	if piCfg.ROI != "" {
+		args = append(args, "-roi", piCfg.ROI)
 	}
-	if cfg.Sharpness != 0 {
-		args = append(args, "-sh", strconv.Itoa(cfg.Sharpness))
+	if piCfg.Saturation != 0 {
+		args = append(args, "-sa", strconv.Itoa(piCfg.Saturation))
 	}
-	if cfg.Width != 0 {
-		args = append(args, "-w", strconv.Itoa(cfg.Width))
+	if piCfg.Sharpness != 0 {
+		args = append(args, "-sh", strconv.Itoa(piCfg.Sharpness))
 	}
 
 	cmd.Args = append(cmd.Args, args...)
