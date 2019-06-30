@@ -1,1 +1,8 @@
-{}
+{
+    "width": 1920,
+    "height": 1080,
+    "mode": 5,
+    "awb": "off",
+    "awb_gains": "1.5,1.2",
+    "exposure": "sports"
+}
