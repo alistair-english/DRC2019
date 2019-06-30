@@ -50,18 +50,6 @@ func (c *BasicControllerService) Start() {
 
 		controller := newBasicDriveController()
 
-		// get the image
-		getImgBlocking(c.actionRequestChannel, &sourceImg)
-
-		// blur the image
-		gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
-
-		// convert to HSV
-		gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
-
-		// Find the HSV objects in the image
-		result := cvhelpers.FindHSVObjects(hsvImg, objects)
-
 		for { // inifinte loop
 
 			// get the image
@@ -74,7 +62,7 @@ func (c *BasicControllerService) Start() {
 			gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
 
 			// Find the HSV objects in the image
-			// result := cvhelpers.FindHSVObjects(hsvImg, objects)
+			result := cvhelpers.FindHSVObjects(hsvImg, objects)
 
 			found := make(map[string]cvhelpers.HSVObjectGroupResult)
 
