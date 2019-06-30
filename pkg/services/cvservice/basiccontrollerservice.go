@@ -2,7 +2,6 @@ package cvservice
 
 import (
 	"image"
-	"image/color"
 	"reflect"
 
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -45,7 +44,7 @@ func (c *BasicControllerService) Start() {
 	go func() {
 		// Load Configurations
 		// cvConfig := config.GetCVConfig()
-		controlConfig := config.GetControlPIDConfig()
+		
 
 		// Create the pid controller and set limits / target
 		controlPID := pidctrl.NewPIDController(controlConfig.Pid.P, controlConfig.Pid.I, controlConfig.Pid.D)
@@ -87,17 +86,6 @@ func (c *BasicControllerService) Start() {
 			for _, obj := range result {
 				found[obj.Name] = obj
 			}
-
-			if len(found[LEFT_LINE].Objects) > 0 {
-				gocv.Rectangle(&sourceImg, found[LEFT_LINE].Objects[0].BoundingBox, color.RGBA{0, 0, 255, 0}, 3)
-			}
-
-			if len(found[RIGHT_LINE].Objects) > 0 {
-				gocv.Rectangle(&sourceImg, found[RIGHT_LINE].Objects[0].BoundingBox, color.RGBA{255, 0, 0, 0}, 3)
-			}
-
-			displayWindow.IMShow(sourceImg)
-			displayWindow.WaitKey(0)
 
 			// fmt.Printf("%v %v\n", found[RIGHT_LINE].BoundingBox.Min.X, found[LEFT_LINE].BoundingBox.Max.X)
 
@@ -148,3 +136,4 @@ func (c *BasicControllerService) Start() {
 		}
 	}()
 }
+
