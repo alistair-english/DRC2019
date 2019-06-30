@@ -24,7 +24,7 @@ func getPiCameraCmd() *exec.Cmd {
 	piCfg := config.GetPiCameraConfig()
 	cvCfg := config.GetCVConfig()
 
-	cmd := exec.Command("raspivid", "-cd", "MJPEG", "-t", "0", "-o", "-")
+	cmd := exec.Command("raspivid", "-cd", "H264", "-t", "0", "-o", "-")
 
 	var args []string
 
@@ -103,6 +103,7 @@ func (cam *PiCamera) CameraConnectionTask() {
 
 	for {
 		n, err := cam.stdOut.Read(readBuff)
+		fmt.Println(readBuff[:40])
 		if err != nil {
 			// Should probably log here but for now just retry reading
 			fmt.Println(err)
