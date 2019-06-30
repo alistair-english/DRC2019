@@ -1,16 +1,15 @@
 package cvservice
 
 import (
+	"fmt"
 	"image"
 	"reflect"
 
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
+	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
-	"github.com/alistair-english/DRC2019/pkg/config"
 	"gocv.io/x/gocv"
-
-	"github.com/felixge/pidctrl"
 )
 
 // BasicControllerService provides recording service
@@ -34,24 +33,9 @@ func (c *BasicControllerService) FulfullActionRequest(request arch.ActionRequest
 	// Does not fulfill requests, only creates
 }
 
-const (
-	LEFT_LINE  = "LEFT_LINE"
-	RIGHT_LINE = "RIGHT_LINE"
-)
-
 // Start from Service interface - provides main functionality
 func (c *BasicControllerService) Start() {
 	go func() {
-		// Load Configurations
-		// cvConfig := config.GetCVConfig()
-		
-
-		// Create the pid controller and set limits / target
-		controlPID := pidctrl.NewPIDController(controlConfig.Pid.P, controlConfig.Pid.I, controlConfig.Pid.D)
-
-		controlPID.SetOutputLimits(-90.0, 90.0)
-		controlPID.Set(0.00)
-
 		// Image Mats
 		var sourceImg = gocv.NewMat()
 		defer sourceImg.Close()
@@ -66,6 +50,8 @@ func (c *BasicControllerService) Start() {
 
 		displayWindow := gocv.NewWindow("Display")
 		defer displayWindow.Close()
+
+		controller := newBasicDriveController()
 
 		for { // inifinte loop
 
@@ -86,6 +72,12 @@ func (c *BasicControllerService) Start() {
 			for _, obj := range result {
 				found[obj.Name] = obj
 			}
+
+			control := controller.update(found)
+
+			fmt.Println(control)
+
+			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 
 			// fmt.Printf("%v %v\n", found[RIGHT_LINE].BoundingBox.Min.X, found[LEFT_LINE].BoundingBox.Max.X)
 
@@ -136,4 +128,3 @@ func (c *BasicControllerService) Start() {
 		}
 	}()
 }
-

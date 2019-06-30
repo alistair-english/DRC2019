@@ -44,7 +44,7 @@ func main() {
 
 	log.Log(TAG, logging.All, "Getting serial log...")
 	serLogService := seriallogservice.NewSerialLogService()
-	log.Log("", logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
 	log.Log(TAG, logging.All, "Registering services... ")
 	router.Register(serService)
