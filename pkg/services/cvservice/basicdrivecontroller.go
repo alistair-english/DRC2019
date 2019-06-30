@@ -37,10 +37,10 @@ func newBasicDriveController() *basicDriveController {
 
 func (c *basicDriveController) update(objs map[string]cvhelpers.HSVObjectGroupResult) serialservice.Control {
 	c.currentObjects = objs
-	ang, _ := c.getTrackAngleAndDriveSpeed()
+	ang, spd := c.getTrackAngleAndDriveSpeed()
 	return serialservice.Control{
 		Dir: ang,
-		Spd: 50,w
+		Spd: spd,
 	}
 }
 
