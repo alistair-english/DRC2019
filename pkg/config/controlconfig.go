@@ -53,8 +53,8 @@ func GetBoundaryPIDConfig() BoundaryPID {
 	return boundPid
 }
 
-// GetOponentPIDConfig returns a opponent pid struct populated from the config file
-func GetOponentPIDConfig() OpponentPID {
+// GetOpponentPIDConfig returns a opponent pid struct populated from the config file
+func GetOpponentPIDConfig() OpponentPID {
 	var oppPid OpponentPID
 	controlConfigFile, err := os.Open(os.Getenv("GOPATH") + CONTROL_CONF_FILE)
 	defer controlConfigFile.Close()

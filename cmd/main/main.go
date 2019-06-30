@@ -12,6 +12,7 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/logging"
 
 	"flag"
+
 	"github.com/fatih/color"
 )
 
@@ -58,7 +59,7 @@ func main() {
 
 	log.Log(TAG, logging.All, "Getting serial log...")
 	serLogService := seriallogservice.NewSerialLogService()
-	log.Log("", logging.All, "Done.")
+	log.Logln("", logging.All, "Done.")
 
 	log.Log(TAG, logging.All, "Registering services... ")
 	router.Register(serService)

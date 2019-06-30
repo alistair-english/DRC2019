@@ -1,17 +1,15 @@
 package cvservice
 
 import (
+	"fmt"
 	"image"
-	"image/color"
 	"reflect"
 
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
+	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
-	"github.com/alistair-english/DRC2019/pkg/config"
 	"gocv.io/x/gocv"
-
-	"github.com/felixge/pidctrl"
 )
 
 // BasicControllerService provides recording service
@@ -35,24 +33,9 @@ func (c *BasicControllerService) FulfullActionRequest(request arch.ActionRequest
 	// Does not fulfill requests, only creates
 }
 
-const (
-	LEFT_LINE  = "LEFT_LINE"
-	RIGHT_LINE = "RIGHT_LINE"
-)
-
 // Start from Service interface - provides main functionality
 func (c *BasicControllerService) Start() {
 	go func() {
-		// Load Configurations
-		// cvConfig := config.GetCVConfig()
-		controlConfig := config.GetControlPIDConfig()
-
-		// Create the pid controller and set limits / target
-		controlPID := pidctrl.NewPIDController(controlConfig.Pid.P, controlConfig.Pid.I, controlConfig.Pid.D)
-
-		controlPID.SetOutputLimits(-90.0, 90.0)
-		controlPID.Set(0.00)
-
 		// Image Mats
 		var sourceImg = gocv.NewMat()
 		defer sourceImg.Close()
@@ -67,6 +50,8 @@ func (c *BasicControllerService) Start() {
 
 		displayWindow := gocv.NewWindow("Display")
 		defer displayWindow.Close()
+
+		controller := newBasicDriveController()
 
 		for { // inifinte loop
 
@@ -88,16 +73,11 @@ func (c *BasicControllerService) Start() {
 				found[obj.Name] = obj
 			}
 
-			if len(found[LEFT_LINE].Objects) > 0 {
-				gocv.Rectangle(&sourceImg, found[LEFT_LINE].Objects[0].BoundingBox, color.RGBA{0, 0, 255, 0}, 3)
-			}
+			control := controller.update(found)
 
-			if len(found[RIGHT_LINE].Objects) > 0 {
-				gocv.Rectangle(&sourceImg, found[RIGHT_LINE].Objects[0].BoundingBox, color.RGBA{255, 0, 0, 0}, 3)
-			}
+			fmt.Println(control)
 
-			displayWindow.IMShow(sourceImg)
-			displayWindow.WaitKey(0)
+			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 
 			// fmt.Printf("%v %v\n", found[RIGHT_LINE].BoundingBox.Min.X, found[LEFT_LINE].BoundingBox.Max.X)
 
