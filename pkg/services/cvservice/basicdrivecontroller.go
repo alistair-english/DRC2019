@@ -37,10 +37,10 @@ func newBasicDriveController() *basicDriveController {
 
 func (c *basicDriveController) update(objs map[string]cvhelpers.HSVObjectGroupResult) serialservice.Control {
 	c.currentObjects = objs
-	ang, spd := c.getTrackAngleAndDriveSpeed()
+	ang, _ := c.getTrackAngleAndDriveSpeed()
 	return serialservice.Control{
 		Dir: ang,
-		Spd: spd,
+		Spd: 50,w
 	}
 }
 
@@ -73,7 +73,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed() (int8, int8) {
 	cartX := horX - (c.width / 2)
 	cartY := c.height
 
-	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
+	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(c.height-10), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
 	driveSpeed := int8((cartY / c.height) * 100)
