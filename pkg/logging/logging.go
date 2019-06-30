@@ -2,11 +2,12 @@ package logging
 
 import (
 	"fmt"
+	"github.com/alistair-english/DRC2019/pkg/services/seriallogservice"
+	"github.com/fatih/color"
 	"io"
+	"log"
 	"os"
 	"sync"
-
-	"github.com/alistair-english/DRC2019/pkg/services/seriallogservice"
 )
 
 var (
@@ -27,7 +28,7 @@ const (
 	All       = LogFile | LogStd | LogSerial
 )
 
-const TAG = "LOGGER"
+const TAG = ""
 
 // Stream contains a stream and title
 type Stream struct {
@@ -72,12 +73,13 @@ func (l *logger) AddStream(fileName string, title string) {
 func (l *logger) ChangeStream(title string) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.Logln(TAG, All, "---Changing Log Stream: [%v -> %v]---", l.cTitle, title)
+	l.Logln(TAG, LogFile, "---Changing Log Stream: [%v -> %v]---", l.cTitle, title)
 	for i := range l.streamList {
 		if l.streamList[i].title == title {
 			l.cStream = l.streamList[i].stream
+			log.SetOutput(l.cStream)
 			if title != l.cTitle {
-				l.Logln(TAG, All, "---Changing Log Stream: [%v -> %v]---", l.cTitle, title)
+				l.Logln(TAG, LogFile, "---Changing Log Stream: [%v -> %v]---", l.cTitle, title)
 			}
 			l.cTitle = l.streamList[i].title
 			l.cIndex = i
@@ -100,15 +102,21 @@ func (l *logger) ListStreams() {
 }
 
 func (l *logger) Log(tag string, flags int, format string, v ...interface{}) {
+	// Make some colors
+	tagColour := color.New(color.FgCyan).Add(color.Bold)
+	logColour := color.New(color.FgWhite)
 	// I would like to replace fmt.Sprintf with custom function but this will do
 	if tag != "" {
 		tag = tag + ": "
 	}
 	if (flags & LogFile) != 0 {
-		l.cStream.Write([]byte(fmt.Sprintf(tag+format, v...)))
+		// l.cStream.Write([]byte(fmt.Sprintf(tag+format, v...)))
+		log.Printf(tag+format, v...)
 	}
 	if (flags & LogStd) != 0 {
-		fmt.Printf(tag+format, v...)
+		// fmt.Printf(tag+format, v...)
+		tagColour.Print(tag)
+		logColour.Printf(format, v...)
 	}
 	if (flags&LogSerial) != 0 && l.serLog != nil {
 		l.serLog.LogToSerial(fmt.Sprintf(tag+format, v...))
@@ -116,15 +124,21 @@ func (l *logger) Log(tag string, flags int, format string, v ...interface{}) {
 }
 
 func (l *logger) Logln(tag string, flags int, format string, v ...interface{}) {
+	// Make some colors
+	tagColour := color.New(color.FgCyan).Add(color.Bold)
+	logColour := color.New(color.FgWhite)
 	// I would like to replace fmt.Sprintf with custom function but this will do
 	if tag != "" {
 		tag = tag + ": "
 	}
 	if (flags & LogFile) != 0 {
-		l.cStream.Write([]byte(fmt.Sprintf(tag+format+"\n", v...)))
+		// l.cStream.Write([]byte(fmt.Sprintf(tag+format+"\n", v...)))
+		log.Printf(tag+format+"\n", v...)
 	}
 	if (flags & LogStd) != 0 {
-		fmt.Printf(tag+format+"\n", v...)
+		// fmt.Printf(tag+format+"\n", v...)
+		tagColour.Print(tag)
+		logColour.Printf(format+"\n", v...)
 	}
 	if (flags&LogSerial) != 0 && l.serLog != nil {
 		l.serLog.LogToSerial(fmt.Sprintf(tag+format+"\n", v...))
