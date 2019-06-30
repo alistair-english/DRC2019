@@ -10,7 +10,7 @@ func main() {
 	router := arch.NewRouter()
 
 	calService := &cvservice.CalibratorService{}
-	camService, _ := cameraservice.NewFileReaderCamera("../recorder/recording_06-30-2019_20:14:52.avi")
+	camService, _ := cameraservice.NewFileReaderCamera("../recorder/recording_06-30-2019_21:42:55.avi")
 
 	router.Register(calService)
 	router.Register(camService)

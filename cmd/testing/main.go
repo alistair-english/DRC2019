@@ -10,31 +10,16 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 
 	"github.com/alistair-english/DRC2019/pkg/logging"
-
-	"flag"
-
-	"github.com/fatih/color"
 )
 
 const TAG = "MAIN"
 
 func main() {
-	// Get flags from CLI inputs (Use -log to enable logging)
-	var logEnabled bool
-	flag.BoolVar(&logEnabled, "log", false, "Add this flag to enable logging")
-	flag.Parse()
-
-	if logEnabled {
-		color.Green("Logging Enabled")
-	} else {
-		color.Red("Logging Disabled")
-	}
-
 	router := arch.NewRouter()
 
 	fmt.Println("Getting Logger... ")
 	log := logging.Logger()
-	log.Init(logEnabled)
+	log.Init(true)
 	fmt.Println("Done.")
 
 	log.Log(TAG, logging.All, "Getting serial... ")
@@ -46,7 +31,7 @@ func main() {
 	log.Logln("", logging.All, "Done.")
 
 	log.Log(TAG, logging.All, "Getting camera... ")
-	camService, err := cameraservice.NewFileReaderCamera("../recorder/recording_06-30-2019_48:59:48.avi")
+	camService, err := cameraservice.NewFileReaderCamera("../recorder/recording_06-30-2019_21:42:55.avi")
 	if err != nil {
 		log.Logln("", logging.All, err.Error())
 		return
