@@ -76,9 +76,6 @@ func (c *CalibratorService) Start() {
 		defer hsvImg.Close()
 		defer threshImg.Close()
 
-		// Img request setup
-		imgReadChannel := make(chan bool, 1)
-
 		var (
 			lowerMask = cvhelpers.NewHSVMask(
 				0, 0, 0,
@@ -101,7 +98,7 @@ func (c *CalibratorService) Start() {
 		)
 
 		// Read Image
-		getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
+		getImgBlocking(c.actionRequestChannel, &sourceImg)
 
 		for { // foreva
 
@@ -152,7 +149,7 @@ func (c *CalibratorService) Start() {
 			key = sourceWindow.WaitKey(500)
 			if key == 32 {
 				// Read Image
-				getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
+				getImgBlocking(c.actionRequestChannel, &sourceImg)
 			}
 		}
 	}()

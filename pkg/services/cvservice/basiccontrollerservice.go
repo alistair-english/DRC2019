@@ -42,9 +42,6 @@ func (c *BasicControllerService) Start() {
 		var hsvImg = gocv.NewMat()
 		defer hsvImg.Close()
 
-		// Img Read Channel
-		imgReadChannel := make(chan bool, 1)
-
 		// Create objects
 		objects := getObjectsFromConfig()
 
@@ -56,7 +53,7 @@ func (c *BasicControllerService) Start() {
 		for { // inifinte loop
 
 			// get the image
-			getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
+			getImgBlocking(c.actionRequestChannel, &sourceImg)
 
 			// blur the image
 			gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)

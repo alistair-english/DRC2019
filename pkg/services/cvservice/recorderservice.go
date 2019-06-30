@@ -42,7 +42,7 @@ func (r *RecorderService) Start() {
 	go func() {
 		camImg := gocv.NewMat()
 		timingChannel := make(chan bool, 1)
-		getImgBlocking(r.actionRequestChannel, &camImg, timingChannel)
+		getImgBlocking(r.actionRequestChannel, &camImg)
 		fname := fmt.Sprintf(r.recordFolderPath+"recording_%v.avi", time.Now().Format("01-02-2006_15:04:05"))
 		out, _ := gocv.VideoWriterFile(fname, "XVID", 20.0, camImg.Size()[1], camImg.Size()[0], true)
 
