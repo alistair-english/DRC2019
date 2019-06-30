@@ -81,25 +81,13 @@ func (c *CalibratorService) Start() {
 
 		var (
 			lowerMask = cvhelpers.NewHSVMask(
-				gocv.NewScalar(
-					0,
-					0,
-					0,
-					0.0,
-				),
-				cvConfig.ImgChannels,
+				0, 0, 0,
 				cvConfig.ImgHeight,
 				cvConfig.ImgWidth,
 			)
 
 			upperMask = cvhelpers.NewHSVMask(
-				gocv.NewScalar(
-					0,
-					0,
-					0,
-					0.0,
-				),
-				cvConfig.ImgChannels,
+				0, 0, 0,
 				cvConfig.ImgHeight,
 				cvConfig.ImgWidth,
 			)
@@ -134,15 +122,13 @@ func (c *CalibratorService) Start() {
 			if key == 13 {
 				if lowerHSV != prevLowerHSV || upperHSV != prevUpperHSV {
 					lowerMask = cvhelpers.NewHSVMask(
-						lowerHSV,
-						cvConfig.ImgChannels,
+						lowerHSV.Val1, lowerHSV.Val2, lowerHSV.Val3,
 						cvConfig.ImgHeight,
 						cvConfig.ImgWidth,
 					)
 
 					upperMask = cvhelpers.NewHSVMask(
-						upperHSV,
-						cvConfig.ImgChannels,
+						upperHSV.Val1, upperHSV.Val2, upperHSV.Val3,
 						cvConfig.ImgHeight,
 						cvConfig.ImgWidth,
 					)

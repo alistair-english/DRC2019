@@ -24,33 +24,16 @@ func ReadHSV(cam *gocv.VideoCapture, dst *gocv.Mat) {
 // HSVMask is a HSV mask (duh)
 type HSVMask gocv.Mat
 
+// Mat gets the gocv matrix of the hsv mask
+func (h *HSVMask) Mat() gocv.Mat {
+	return gocv.Mat(*h)
+}
+
 // NewHSVMask creates a HSV mask that can be used in gocv.InRange
-func NewHSVMask(in gocv.Scalar, channels int, rows int, cols int) HSVMask {
-
-	source := gocv.NewMatFromScalar(in, gocv.MatTypeCV8UC3)
-	defer source.Close()
-
-	output := gocv.NewMat()
-
-	// input is a 1x1x3 with the 3 HSV values we need
-	inputChannels := gocv.Split(source)
-
-	// the mask we want is a copy of the input channels but at the size defined by the caller
+func NewHSVMask(H, S, V float64, rows int, cols int) HSVMask {
 	mask := gocv.NewMatWithSize(rows, cols, gocv.MatTypeCV8UC3)
-	maskChannels := gocv.Split(mask)
-
-	// copy HSV values to the mask
-	for c := 0; c < channels; c++ {
-		for row := 0; row < rows; row++ {
-			for col := 0; col < cols; col++ {
-				maskChannels[c].SetUCharAt(row, col, inputChannels[c].GetUCharAt(0, 0))
-			}
-		}
-	}
-
-	gocv.Merge(maskChannels, &output)
-
-	return HSVMask(output)
+	mask.SetTo(gocv.NewScalar(H, S, V, 0))
+	return HSVMask(mask)
 }
 
 // NewHSVMaskFromFile reads in HSVMask from file

@@ -57,9 +57,7 @@ func newMaskFromConfig(cfg config.Mask, objName string, rows, cols, channels int
 	}
 
 	return cvhelpers.NewHSVMask(
-		gocv.NewScalar(cfg.H, cfg.S, cfg.V, 0),
-		channels,
-		rows,
-		cols,
+		cfg.H, cfg.S, cfg.V,
+		rows, cols,
 	)
 }
