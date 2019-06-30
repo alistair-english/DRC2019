@@ -38,7 +38,7 @@ func (c *basicDriveController) update(objs map[string]cvhelpers.HSVObjectGroupRe
 	c.currentObjects = objs
 	ang, spd := c.getTrackAngleAndDriveSpeed()
 	return serialservice.Control{
-		Dir: -ang, // TODO: Get cooper to fix turn direction
+		Dir: ang, // TODO: Get cooper to fix turn direction
 		Spd: spd,
 	}
 }
