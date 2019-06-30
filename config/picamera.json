@@ -1,6 +1,7 @@
 {
     "width": 1920,
     "height": 1080,
+    "mode": 5,
     "awb": "fluorescent",
-    "mode": 7
+    "exposure": "sports",
 }

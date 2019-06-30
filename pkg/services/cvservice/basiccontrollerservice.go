@@ -48,8 +48,8 @@ func (c *BasicControllerService) Start() {
 		// Create objects
 		objects := getObjectsFromConfig()
 
-		displayWindow := gocv.NewWindow("Display")
-		defer displayWindow.Close()
+		// displayWindow := gocv.NewWindow("Display")
+		// defer displayWindow.Close()
 
 		controller := newBasicDriveController()
 
