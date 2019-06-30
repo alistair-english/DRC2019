@@ -1,9 +1,6 @@
 package main
 
 import (
-	"image"
-	"image/color"
-
 	"gocv.io/x/gocv"
 
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -33,9 +30,6 @@ func main() {
 	hsvImg := gocv.NewMat()
 	defer hsvImg.Close()
 
-	mask := gocv.NewMat()
-	defer mask.Close()
-
 	blurMask := gocv.NewMat()
 	defer blurMask.Close()
 
@@ -51,14 +45,12 @@ func main() {
 	channels, rows, cols := hsvImg.Channels(), hsvImg.Rows(), hsvImg.Cols()
 
 	// define HSV color upper and lower bound range
-	lowerMask := gocv.NewMat()
-	upperMask := gocv.NewMat()
+
+	lowerMask := cvhelpers.NewHSVMask(gocv.NewScalar(110.0, 100.0, 100.0, 0.0), channels, rows, cols)
+	upperMask := cvhelpers.NewHSVMask(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), channels, rows, cols)
 
 	defer lowerMask.Close()
 	defer upperMask.Close()
-
-	cvhelpers.HSVMask(gocv.NewScalar(110.0, 100.0, 100.0, 0.0), &lowerMask, channels, rows, cols)
-	cvhelpers.HSVMask(gocv.NewScalar(130.0, 255.0, 255.0, 0.0), &upperMask, channels, rows, cols)
 
 	for { // for3vA
 
@@ -67,27 +59,31 @@ func main() {
 		// gocv.GaussianBlur(sourceImg, &blurredImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
 		gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorRGBToHSV)
-		gocv.InRange(hsvImg, lowerMask, upperMask, &mask)
 
-		gocv.GaussianBlur(mask, &blurMask, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
+		mask := gocv.NewMatWithSize(sourceImg.Rows(), sourceImg.Cols(), gocv.MatTypeCV8U)
+		cvhelpers.InRangeBySegments(hsvImg, lowerMask, upperMask, 2, 2, &mask)
+		// gocv.InRange(hsvImg, lowerMask, upperMask, &mask)
 
-		contours := gocv.FindContours(mask, gocv.RetrievalTree, gocv.ChainApproxNone)
+		// gocv.GaussianBlur(mask, &blurMask, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
-		for _, contour := range contours {
-			if gocv.ContourArea(contour) > 1000 {
-				// gocv.DrawContours(&sourceImg, contours, i, color.RGBA{255, 0, 0, 0}, 3)
-				rect := gocv.BoundingRect(contour)
-				gocv.Rectangle(&sourceImg, rect, color.RGBA{255, 0, 0, 0}, 3)
-			}
-		}
+		// contours := gocv.FindContours(mask, gocv.RetrievalTree, gocv.ChainApproxNone)
+
+		// for _, contour := range contours {
+		// 	if gocv.ContourArea(contour) > 1000 {
+		// 		// gocv.DrawContours(&sourceImg, contours, i, color.RGBA{255, 0, 0, 0}, 3)
+		// 		rect := gocv.BoundingRect(contour)
+		// 		gocv.Rectangle(&sourceImg, rect, color.RGBA{255, 0, 0, 0}, 3)
+		// 	}
+		// }
 
 		maskWindow.IMShow(mask)
+		maskWindow.WaitKey(1)
 
 		// gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorHSVToBGR)
 
-		sourceWindow.IMShow(sourceImg)
+		// sourceWindow.IMShow(sourceImg)
 
-		sourceWindow.WaitKey(1)
+		// sourceWindow.WaitKey(1)
 	}
 
 	// - get hsv image

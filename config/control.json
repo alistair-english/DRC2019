@@ -1,0 +1,19 @@
+{
+    "controlPid":{
+        "P": 1,
+        "I": 0,
+        "D": 0
+    },
+
+    "boundaryPid":{
+        "P": 0,
+        "I": 0,
+        "D": 0
+    },
+
+    "opponentPid":{
+        "P": 0,
+        "I": 0,
+        "D": 0
+    }
+}

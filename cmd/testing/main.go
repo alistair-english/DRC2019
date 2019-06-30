@@ -10,25 +10,11 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 
 	"github.com/alistair-english/DRC2019/pkg/logging"
-
-	"flag"
-	"github.com/fatih/color"
 )
 
 const TAG = "MAIN"
 
 func main() {
-	// Get flags from CLI inputs (Use -log to enable logging)
-	var logEnabled bool
-	flag.BoolVar(&logEnabled, "log", false, "Add this flag to enable logging")
-	flag.Parse()
-
-	if logEnabled {
-		color.Green("Logging Enabled")
-	} else {
-		color.Red("Logging Disabled")
-	}
-
 	router := arch.NewRouter()
 
 	fmt.Println("Getting Logger... ")
@@ -37,7 +23,7 @@ func main() {
 	fmt.Println("Done.")
 
 	log.Log(TAG, logging.All, "Getting serial... ")
-	serService, err := serialservice.NewPiSerial()
+	serService, err := serialservice.NewFakeSerial()
 	if err != nil {
 		log.Logln("", logging.All, err.Error())
 		return
@@ -45,7 +31,7 @@ func main() {
 	log.Logln("", logging.All, "Done.")
 
 	log.Log(TAG, logging.All, "Getting camera... ")
-	camService, err := cameraservice.NewPiCamera()
+	camService, err := cameraservice.NewFileReaderCamera("/home/alistair/Dev/go/src/github.com/alistair-english/DRC2019/cmd/recorder/recording_06-27-2019_10:10:10.avi")
 	if err != nil {
 		log.Logln("", logging.All, err.Error())
 		return
@@ -83,7 +69,7 @@ func main() {
 	serLogService.Start()
 	log.Logln("", logging.All, "Done.")
 
-	log.AddSerialLogService(serLogService)
+	// log.AddSerialLogService(serLogService)
 
 	log.Logln(TAG, logging.All, "Starting Router (blocking)")
 	// router is blocking
