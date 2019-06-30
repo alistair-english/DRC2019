@@ -1,6 +1,7 @@
 package cvservice
 
 import (
+	"fmt"
 	"image"
 	"math"
 
@@ -38,7 +39,7 @@ func (c *basicDriveController) update(objs map[string]cvhelpers.HSVObjectGroupRe
 	c.currentObjects = objs
 	ang, spd := c.getTrackAngleAndDriveSpeed()
 	return serialservice.Control{
-		Dir: ang, // TODO: Get cooper to fix turn direction
+		Dir: ang,
 		Spd: spd,
 	}
 }
@@ -61,6 +62,10 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed() (int8, int8) {
 		// no line found -> create a line out to the right
 		rightLine.BoundingBox = image.Rect(c.width, c.height, c.width, c.height)
 	}
+
+	fmt.Println("Left X:", leftLine.BoundingBox.Max.X)
+	fmt.Println("Right X:", rightLine.BoundingBox.Min.X)
+	fmt.Println()
 
 	horDiff := rightLine.BoundingBox.Min.X - leftLine.BoundingBox.Max.X
 	horX := leftLine.BoundingBox.Max.X + horDiff/2
