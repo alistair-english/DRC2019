@@ -31,8 +31,7 @@ func (h *HSVMask) Mat() gocv.Mat {
 
 // NewHSVMask creates a HSV mask that can be used in gocv.InRange
 func NewHSVMask(H, S, V float64, rows int, cols int) HSVMask {
-	mask := gocv.NewMatWithSize(rows, cols, gocv.MatTypeCV8UC3)
-	mask.SetTo(gocv.NewScalar(H, S, V, 0))
+	mask := gocv.NewMatWithSizeFromScalar(gocv.NewScalar(H, S, V, 0), rows, cols, gocv.MatTypeCV8UC3)
 	return HSVMask(mask)
 }
 
@@ -186,6 +185,9 @@ func InRangeBySegments(img gocv.Mat, lowerMask, upperMask HSVMask, numSegHor, nu
 		// this should throw error
 	}
 
+	lowerMaskMat := lowerMask.Mat()
+	upperMaskMat := upperMask.Mat()
+
 	// dst must be same size as img and of type MatTypeCV8U
 	segWidth := img.Cols() / numSegHor
 	segHeight := img.Rows() / numSegVert
@@ -204,8 +206,6 @@ func InRangeBySegments(img gocv.Mat, lowerMask, upperMask HSVMask, numSegHor, nu
 
 			sourceSeg := img.Region(seg)
 			destSeg := dst.Region(seg)
-			lowerMaskMat := gocv.Mat(lowerMask)
-			upperMaskMat := gocv.Mat(upperMask)
 
 			go func() {
 				gocv.InRange(sourceSeg, lowerMaskMat.Region(seg), upperMaskMat.Region(seg), &destSeg)

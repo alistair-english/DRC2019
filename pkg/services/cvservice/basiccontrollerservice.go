@@ -1,8 +1,8 @@
 package cvservice
 
 import (
-	"fmt"
 	"image"
+	"image/color"
 	"reflect"
 
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -65,6 +65,9 @@ func (c *BasicControllerService) Start() {
 		// Create objects
 		objects := getObjectsFromConfig()
 
+		displayWindow := gocv.NewWindow("Display")
+		defer displayWindow.Close()
+
 		for { // inifinte loop
 
 			// get the image
@@ -77,7 +80,7 @@ func (c *BasicControllerService) Start() {
 			gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
 
 			// Find the HSV objects in the image
-			result := cvhelpers.FindHSVObjects(sourceImg, objects)
+			result := cvhelpers.FindHSVObjects(hsvImg, objects)
 
 			found := make(map[string]cvhelpers.HSVObjectGroupResult)
 
@@ -85,7 +88,16 @@ func (c *BasicControllerService) Start() {
 				found[obj.Name] = obj
 			}
 
-			fmt.Println(found)
+			if len(found[LEFT_LINE].Objects) > 0 {
+				gocv.Rectangle(&sourceImg, found[LEFT_LINE].Objects[0].BoundingBox, color.RGBA{0, 0, 255, 0}, 3)
+			}
+
+			if len(found[RIGHT_LINE].Objects) > 0 {
+				gocv.Rectangle(&sourceImg, found[RIGHT_LINE].Objects[0].BoundingBox, color.RGBA{255, 0, 0, 0}, 3)
+			}
+
+			displayWindow.IMShow(sourceImg)
+			displayWindow.WaitKey(0)
 
 			// fmt.Printf("%v %v\n", found[RIGHT_LINE].BoundingBox.Min.X, found[LEFT_LINE].BoundingBox.Max.X)
 
