@@ -3,7 +3,6 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/services/cameraservice"
@@ -42,16 +41,16 @@ func (r *RecorderService) Start() {
 	go func() {
 		camImg := gocv.NewMat()
 		timingChannel := make(chan bool, 1)
-		getImgBlocking(r.actionRequestChannel, &camImg)
-		fname := fmt.Sprintf(r.recordFolderPath+"recording_%v.avi", time.Now().Format("01-02-2006_15:04:05"))
-		out, _ := gocv.VideoWriterFile(fname, "XVID", 20.0, camImg.Size()[1], camImg.Size()[0], true)
+		// getImgBlocking(r.actionRequestChannel, &camImg)
+		// fname := fmt.Sprintf(r.recordFolderPath+"recording_%v.avi", time.Now().Format("01-02-2006_15:04:05"))
+		// out, _ := gocv.VideoWriterFile(fname, "XVID", 20.0, camImg.Size()[1], camImg.Size()[0], true)
 
 		r.actionRequestChannel <- cameraservice.GetImageActionReq{&camImg, timingChannel}
 
 		for range timingChannel {
 			go func() {
-				out.Write(camImg)
-				fmt.Println("frame written")
+				// out.Write(camImg)
+				fmt.Println("img ready")
 			}()
 			r.actionRequestChannel <- cameraservice.GetImageActionReq{&camImg, timingChannel}
 		}
