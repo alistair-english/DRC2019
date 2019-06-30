@@ -78,53 +78,6 @@ func (c *BasicControllerService) Start() {
 			fmt.Println(control)
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
-
-			// fmt.Printf("%v %v\n", found[RIGHT_LINE].BoundingBox.Min.X, found[LEFT_LINE].BoundingBox.Max.X)
-
-			// leftLine, lExists := found[LEFT_LINE]
-			// rightLine, rExists := found[RIGHT_LINE]
-
-			// leftX := gohelpers.B2i(lExists)*leftLine.BoundingBox.Max.X + gohelpers.B2i(!lExists)*0
-			// rightX := gohelpers.B2i(rExists)*rightLine.BoundingBox.Min.X + gohelpers.B2i(!rExists)*cols
-
-			// horDiff := rightX - leftX
-			// horCoord := leftX + horDiff/2
-
-			// vertCoord := int(math.Min(
-			// 	float64(gohelpers.B2i(lExists)*leftLine.BoundingBox.Min.Y+gohelpers.B2i(!lExists)*rows),
-			// 	float64(gohelpers.B2i(rExists)*rightLine.BoundingBox.Min.Y+gohelpers.B2i(!rExists)*rows),
-			// ))
-
-			// gocv.Rectangle(&sourceImg, found[RIGHT_LINE].BoundingBox, color.RGBA{255, 255, 0, 0}, 3)
-			// gocv.Rectangle(&sourceImg, found[LEFT_LINE].BoundingBox, color.RGBA{0, 0, 255, 0}, 3)
-
-			// gocv.Line(&sourceImg, image.Point{cols / 2, rows}, image.Point{horCoord, vertCoord}, color.RGBA{0, 255, 0, 0}, 3)
-			// gocv.Circle(&sourceImg, image.Point{horCoord, vertCoord}, 5, color.RGBA{255, 0, 0, 0}, 3)
-
-			// cartX := horCoord - (cols / 2)
-			// cartY := rows - vertCoord
-
-			// cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
-			// // cartLen := math.Sqrt(math.Pow(float64(cartY), 2) + math.Pow(float64(cartX), 2))
-
-			// driveAngle := CartesianToDriveAngle(cartAngle)
-			// // driveSpeed := int8((cartLen / diagonalLen) * 100)
-
-			// tunedAngle := controlPID.Update(float64(driveAngle))
-			// fmt.Printf("Corrected Angle: %v \n", tunedAngle)
-
-			// c.actionRequestChannel <- serialservice.SerialSendActionReq{
-			// 	serialservice.Control{
-			// 		Dir: -driveAngle,
-			// 		Spd: 100,
-			// 	},
-			// }
-
-			// fmt.Println(driveAngle, -driveAngle)
-
-			// Display source img
-			// displayWindow.IMShow(sourceImg)
-			// displayWindow.WaitKey(0)
 		}
 	}()
 }
