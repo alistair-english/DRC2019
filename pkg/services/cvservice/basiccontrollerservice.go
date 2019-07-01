@@ -57,18 +57,19 @@ func (c *BasicControllerService) Start() {
 			getImgBlocking(c.actionRequestChannel, &sourceImg)
 			// fmt.Println("Img: ", time.Since(start))
 
+			start := time.Now()
 			// blur the image
 			gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
 			// convert to HSV
 			gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
 
-			// start = time.Now()
+			// start := time.Now()
 			// Find the HSV objects in the image
 			result := cvhelpers.FindHSVObjects(hsvImg, objects)
 			// fmt.Println("Calc: ", time.Since(start))
 
-			start := time.Now()
+			// start := time.Now()
 			control := controller.update(result)
 			fmt.Println(time.Since(start))
 
