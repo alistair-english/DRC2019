@@ -1,6 +1,6 @@
 {
-    "imgWidth": 1920,
-    "imgHeight": 1080,
+    "imgWidth": 960,
+    "imgHeight": 540,
     "imgChannels": 3,
 
     "objects": [
