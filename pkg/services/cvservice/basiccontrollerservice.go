@@ -3,7 +3,6 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -56,7 +55,7 @@ func (c *BasicControllerService) Start() {
 			getImgBlocking(c.actionRequestChannel, &sourceImg)
 			// fmt.Println("Img: ", time.Since(start))
 
-			start := time.Now()
+			// start := time.Now()
 			// blur the image
 			// gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
@@ -71,9 +70,10 @@ func (c *BasicControllerService) Start() {
 
 			// start := time.Now()
 			control := controller.update(result)
-			fmt.Println(time.Since(start))
+			// fmt.Println(time.Since(start))
 
 			fmt.Println(control)
+			fmt.Println()
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 		}
