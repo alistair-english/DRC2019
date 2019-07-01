@@ -63,6 +63,7 @@ func (c *BasicControllerService) Start() {
 
 			// convert to HSV
 			gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
+			fmt.Println(time.Since(start))
 
 			// start := time.Now()
 			// Find the HSV objects in the image
@@ -71,7 +72,7 @@ func (c *BasicControllerService) Start() {
 
 			// start := time.Now()
 			control := controller.update(result)
-			fmt.Println(time.Since(start))
+			// fmt.Println(time.Since(start))
 
 			fmt.Println(control)
 
