@@ -2,7 +2,6 @@ package cvservice
 
 import (
 	"fmt"
-	"image"
 	"reflect"
 	"time"
 
@@ -59,10 +58,10 @@ func (c *BasicControllerService) Start() {
 
 			start := time.Now()
 			// blur the image
-			gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
+			// gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
 			// convert to HSV
-			gocv.CvtColor(hsvImg, &hsvImg, gocv.ColorBGRToHSV)
+			gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 			fmt.Println(time.Since(start))
 
 			// start := time.Now()
