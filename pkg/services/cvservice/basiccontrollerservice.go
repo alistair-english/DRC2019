@@ -51,12 +51,9 @@ func (c *BasicControllerService) Start() {
 
 		for { // inifinte loop
 
-			// getImgTime := time.Now()
 			// get the image
 			getImgBlocking(c.actionRequestChannel, &sourceImg)
-			// fmt.Println(time.Since(getImgTime))
 
-			// processTime := time.Now()
 			// blur the image
 			gocv.GaussianBlur(sourceImg, &hsvImg, image.Point{11, 11}, 0, 0, gocv.BorderReflect101)
 
@@ -68,10 +65,7 @@ func (c *BasicControllerService) Start() {
 
 			control := controller.update(result)
 
-			// fmt.Println(time.Since(processTime))
-
 			fmt.Println(control)
-			// fmt.Println()
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 		}
