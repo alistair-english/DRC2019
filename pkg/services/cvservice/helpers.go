@@ -9,8 +9,6 @@ import (
 	"gocv.io/x/gocv"
 )
 
-const TAG = "CVSERVICE-HELPERS"
-
 func getImgBlocking(actionReqChannel chan<- arch.ActionRequest, img *gocv.Mat) {
 	timingChannel := make(chan bool, 1)
 	actionReqChannel <- cameraservice.GetImageActionReq{
