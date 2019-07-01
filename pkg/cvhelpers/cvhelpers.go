@@ -207,7 +207,9 @@ func InRangeBySegments(img gocv.Mat, lowerMask, upperMask HSVMask, numSegHor, nu
 			)
 
 			sourceSeg := img.Region(seg)
+			defer sourceSeg.Close()
 			destSeg := dst.Region(seg)
+			defer destSeg.Close()
 
 			go func() {
 				gocv.InRange(sourceSeg, lowerMaskMat.Region(seg), upperMaskMat.Region(seg), &destSeg)
