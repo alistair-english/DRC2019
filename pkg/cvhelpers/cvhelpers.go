@@ -156,7 +156,7 @@ func findHSVObjectGroup(img gocv.Mat, objectGroup HSVObjectGroup, resultChan cha
 	mask := gocv.NewMatWithSize(img.Rows(), img.Cols(), gocv.MatTypeCV8U)
 	defer mask.Close()
 
-	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 4, 4, &mask)
+	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 2, 2, &mask)
 
 	// TODO: morphological transformations on the mask to make it better
 
