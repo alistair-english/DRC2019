@@ -19,7 +19,7 @@ func main() {
 
 	fmt.Println("Getting Logger... ")
 	log := logging.Logger()
-	log.Init()
+	log.Init(true)
 	fmt.Println("Done.")
 
 	log.Log(TAG, logging.All, "Getting serial... ")
@@ -31,7 +31,7 @@ func main() {
 	log.Logln("", logging.All, "Done.")
 
 	log.Log(TAG, logging.All, "Getting camera... ")
-	camService, err := cameraservice.NewFileReaderCamera("/home/alistair/Dev/go/src/github.com/alistair-english/DRC2019/cmd/recorder/recording_06-27-2019_10:10:10.avi")
+	camService, err := cameraservice.NewFileReaderCamera("../recorder/recording_06-30-2019_21:42:55.avi")
 	if err != nil {
 		log.Logln("", logging.All, err.Error())
 		return

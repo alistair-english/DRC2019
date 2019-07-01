@@ -1,8 +1,11 @@
 package cvservice
 
 import (
+	"fmt"
 	"image"
 	"math"
+
+	"github.com/alistair-english/DRC2019/pkg/logging"
 
 	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
 
@@ -13,10 +16,9 @@ import (
 )
 
 type basicDriveController struct {
-	currentObjects map[string]cvhelpers.HSVObjectGroupResult
-	controlPID     *pidctrl.PIDController
-	width          int
-	height         int
+	controlPID *pidctrl.PIDController
+	width      int
+	height     int
 }
 
 func newBasicDriveController() *basicDriveController {
@@ -34,33 +36,52 @@ func newBasicDriveController() *basicDriveController {
 	return &controller
 }
 
-func (c *basicDriveController) update(objs map[string]cvhelpers.HSVObjectGroupResult) serialservice.Control {
-	c.currentObjects = objs
-	ang, spd := c.getTrackAngleAndDriveSpeed()
+func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) serialservice.Control {
+	var (
+		leftLineGroup  cvhelpers.HSVObjectGroupResult
+		rightLineGroup cvhelpers.HSVObjectGroupResult
+	)
+
+	for _, obj := range objs {
+		switch obj.Name {
+		case LEFT_LINE:
+			leftLineGroup = obj
+		case RIGHT_LINE:
+			rightLineGroup = obj
+		default:
+			logging.L().Logln(TAG, logging.All, "Unknown obj detected: %v", obj)
+		}
+	}
+
+	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
 	return serialservice.Control{
-		Dir: -ang, // TODO: Get cooper to fix turn direction
+		Dir: ang,
 		Spd: spd,
 	}
 }
 
-func (c *basicDriveController) getTrackAngleAndDriveSpeed() (int8, int8) {
+func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup cvhelpers.HSVObjectGroupResult) (int8, int8) {
 	var leftLine cvhelpers.HSVObject
 	var rightLine cvhelpers.HSVObject
 
 	// Extract the points out of the detected objects
-	if len(c.currentObjects[LEFT_LINE].Objects) > 0 {
-		leftLine.BoundingBox = c.currentObjects[LEFT_LINE].Objects[0].BoundingBox
+	if len(leftLineGroup.Objects) > 0 {
+		leftLine.BoundingBox = leftLineGroup.Objects[0].BoundingBox
 	} else {
 		// no line found -> create a line out to the left
 		leftLine.BoundingBox = image.Rect(0, c.height, 0, c.height)
 	}
 
-	if len(c.currentObjects[RIGHT_LINE].Objects) > 0 {
-		rightLine.BoundingBox = c.currentObjects[RIGHT_LINE].Objects[0].BoundingBox
+	if len(rightLineGroup.Objects) > 0 {
+		rightLine.BoundingBox = rightLineGroup.Objects[0].BoundingBox
 	} else {
 		// no line found -> create a line out to the right
 		rightLine.BoundingBox = image.Rect(c.width, c.height, c.width, c.height)
 	}
+
+	fmt.Println("Left X:", leftLine.BoundingBox.Max.X)
+	fmt.Println("Right X:", rightLine.BoundingBox.Min.X)
+	fmt.Println()
 
 	horDiff := rightLine.BoundingBox.Min.X - leftLine.BoundingBox.Max.X
 	horX := leftLine.BoundingBox.Max.X + horDiff/2
@@ -68,7 +89,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed() (int8, int8) {
 	cartX := horX - (c.width / 2)
 	cartY := c.height
 
-	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
+	cartAngle := gohelpers.RadToDeg(math.Atan2(10, float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
 	driveSpeed := int8((cartY / c.height) * 100)

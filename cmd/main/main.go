@@ -34,7 +34,7 @@ func main() {
 
 	fmt.Println("Getting Logger... ")
 	log := logging.Logger()
-	log.Init()
+	log.Init(logEnabled)
 	fmt.Println("Done.")
 
 	log.Log(TAG, logging.All, "Getting serial... ")

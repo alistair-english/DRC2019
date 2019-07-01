@@ -76,9 +76,6 @@ func (c *CalibratorService) Start() {
 		defer hsvImg.Close()
 		defer threshImg.Close()
 
-		// Img request setup
-		imgReadChannel := make(chan bool, 1)
-
 		var (
 			lowerMask = cvhelpers.NewHSVMask(
 				0, 0, 0,
@@ -101,7 +98,7 @@ func (c *CalibratorService) Start() {
 		)
 
 		// Read Image
-		getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
+		getImgBlocking(c.actionRequestChannel, &sourceImg)
 
 		for { // foreva
 
@@ -118,24 +115,26 @@ func (c *CalibratorService) Start() {
 			)
 
 			// Wait for enter
-			key := displayWindow.WaitKey(500)
-			if key == 13 {
-				if lowerHSV != prevLowerHSV || upperHSV != prevUpperHSV {
-					lowerMask = cvhelpers.NewHSVMask(
-						lowerHSV.Val1, lowerHSV.Val2, lowerHSV.Val3,
-						cvConfig.ImgHeight,
-						cvConfig.ImgWidth,
-					)
+			// key := displayWindow.WaitKey(500)
+			// if key == 13 {
 
-					upperMask = cvhelpers.NewHSVMask(
-						upperHSV.Val1, upperHSV.Val2, upperHSV.Val3,
-						cvConfig.ImgHeight,
-						cvConfig.ImgWidth,
-					)
+			// }
 
-					prevLowerHSV = lowerHSV
-					prevUpperHSV = upperHSV
-				}
+			if lowerHSV != prevLowerHSV || upperHSV != prevUpperHSV {
+				lowerMask = cvhelpers.NewHSVMask(
+					lowerHSV.Val1, lowerHSV.Val2, lowerHSV.Val3,
+					cvConfig.ImgHeight,
+					cvConfig.ImgWidth,
+				)
+
+				upperMask = cvhelpers.NewHSVMask(
+					upperHSV.Val1, upperHSV.Val2, upperHSV.Val3,
+					cvConfig.ImgHeight,
+					cvConfig.ImgWidth,
+				)
+
+				prevLowerHSV = lowerHSV
+				prevUpperHSV = upperHSV
 			}
 
 			// convert to HSV
@@ -149,10 +148,10 @@ func (c *CalibratorService) Start() {
 			sourceWindow.IMShow(sourceImg)
 
 			// Wait for space
-			key = sourceWindow.WaitKey(500)
+			key := sourceWindow.WaitKey(500)
 			if key == 32 {
 				// Read Image
-				getImgBlocking(c.actionRequestChannel, &sourceImg, imgReadChannel)
+				getImgBlocking(c.actionRequestChannel, &sourceImg)
 			}
 		}
 	}()

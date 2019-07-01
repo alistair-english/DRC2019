@@ -9,13 +9,13 @@
             "numToFind": 1,
             "minArea": 1000,
             "lowerMask": {
-                "H": 105,
-                "S": 50,
-                "V": 50,
+                "H": 100,
+                "S": 90,
+                "V": 80,
                 "path": "/some/path"
             },
             "upperMask": {
-                "H": 115,
+                "H": 120,
                 "S": 255,
                 "V": 255,
                 "path": "/some/path"
@@ -28,7 +28,7 @@
             "minArea": 1000,
             "lowerMask": {
                 "H": 10,
-                "S": 40,
+                "S": 70,
                 "V": 90,
                 "path": "/some/path"
             },

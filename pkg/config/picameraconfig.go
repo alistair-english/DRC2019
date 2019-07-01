@@ -16,6 +16,7 @@ const (
 // PiCameraConfig is the datatype for the Pi Camera configuration
 type PiCameraConfig struct {
 	AWB        string `json:"awb"`
+	AWBGains   string `json:"awb_gains"`
 	Bitrate    int    `json:"bitrate"`
 	Brightness int    `json:"brightness"`
 	Contrast   int    `json:"contrast"`

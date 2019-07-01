@@ -38,6 +38,9 @@ func getPiCameraCmd() *exec.Cmd {
 	if piCfg.AWB != "" {
 		args = append(args, "-awb", piCfg.AWB)
 	}
+	if piCfg.AWBGains != "" {
+		args = append(args, "-awbg", piCfg.AWBGains)
+	}
 	if piCfg.Bitrate != 0 {
 		args = append(args, "-b", strconv.Itoa(piCfg.Bitrate))
 	}

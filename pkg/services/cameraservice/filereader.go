@@ -1,6 +1,8 @@
 package cameraservice
 
-import "gocv.io/x/gocv"
+import (
+	"gocv.io/x/gocv"
+)
 
 // FileReaderCamera is a camera implementation that serves up images from a video
 type FileReaderCamera struct {
@@ -20,7 +22,12 @@ func newFileReaderCameraImplementation(path string) (*FileReaderCamera, error) {
 // RunCameraConnection from camera Implementation
 func (cam FileReaderCamera) RunCameraConnection(imgRequests <-chan GetImageActionReq) {
 	for req := range imgRequests {
-		cam.Capture.Read(req.Img)
+		canRead := cam.Capture.Read(req.Img)
+		if !canRead {
+			cam.Capture.Close()
+			cam.Capture, _ = gocv.VideoCaptureFile(cam.Path)
+			cam.Capture.Read(req.Img)
+		}
 		select {
 		case req.ResponseChannel <- true:
 		default:
