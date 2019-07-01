@@ -36,7 +36,7 @@ func newBasicDriveController() *basicDriveController {
 	return &controller
 }
 
-func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) *serialservice.Control {
+func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) serialservice.Control {
 	var (
 		leftLineGroup  cvhelpers.HSVObjectGroupResult
 		rightLineGroup cvhelpers.HSVObjectGroupResult
@@ -54,7 +54,7 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) *se
 	}
 
 	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
-	return &serialservice.Control{
+	return serialservice.Control{
 		Dir: ang,
 		Spd: spd,
 	}
