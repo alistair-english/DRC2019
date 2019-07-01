@@ -62,7 +62,8 @@ type Contour struct {
 // Will return less contours than num if it finds less.
 func FindLargestContours(in gocv.Mat, num int, minArea float64) []Contour {
 
-	result := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
+	result := gocv.FindContours(in, gocv.RetrievalExternal, gocv.ChainApproxSimple)
+	// result := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
 
 	// Cut out any contours under min area
 	var contours []Contour

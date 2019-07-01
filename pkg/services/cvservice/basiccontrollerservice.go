@@ -3,6 +3,7 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -43,8 +44,8 @@ func (c *BasicControllerService) Start() {
 		// Create objects
 		objects := getObjectsFromConfig()
 
-		// displayWindow := gocv.NewWindow("Display")
-		// defer displayWindow.Close()
+		displayWindow := gocv.NewWindow("Display")
+		defer displayWindow.Close()
 
 		controller := newBasicDriveController()
 
@@ -63,10 +64,19 @@ func (c *BasicControllerService) Start() {
 			gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 			// fmt.Println(time.Since(start))
 
-			// start := time.Now()
+			start := time.Now()
 			// Find the HSV objects in the image
 			result := cvhelpers.FindHSVObjects(hsvImg, objects)
-			// fmt.Println("Calc: ", time.Since(start))
+			fmt.Println("Calc: ", time.Since(start))
+
+			// for _, group := range result {
+			// 	if len(group.Objects) > 0 {
+			// 		gocv.Rectangle(&sourceImg, group.Objects[0].BoundingBox, color.RGBA{255, 0, 0, 0}, 3)
+			// 	}
+			// }
+
+			// displayWindow.IMShow(sourceImg)
+			// displayWindow.WaitKey(0)
 
 			// start := time.Now()
 			control := controller.update(result)
