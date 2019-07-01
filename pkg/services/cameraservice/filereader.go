@@ -24,6 +24,7 @@ func (cam FileReaderCamera) RunCameraConnection(imgRequests <-chan GetImageActio
 	for req := range imgRequests {
 		canRead := cam.Capture.Read(req.Img)
 		if !canRead {
+			cam.Capture.Close()
 			cam.Capture, _ = gocv.VideoCaptureFile(cam.Path)
 			cam.Capture.Read(req.Img)
 		}
