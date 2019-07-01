@@ -5,10 +5,9 @@ import (
 	"image"
 	"reflect"
 
+	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
 	"github.com/alistair-english/DRC2019/pkg/services/serialservice"
-
-	"github.com/alistair-english/DRC2019/pkg/arch"
 	"gocv.io/x/gocv"
 )
 
@@ -67,13 +66,7 @@ func (c *BasicControllerService) Start() {
 			// Find the HSV objects in the image
 			result := cvhelpers.FindHSVObjects(hsvImg, objects)
 
-			found := make(map[string]cvhelpers.HSVObjectGroupResult)
-
-			for _, obj := range result {
-				found[obj.Name] = obj
-			}
-
-			control := controller.update(found)
+			control := controller.update(result)
 
 			// fmt.Println(time.Since(processTime))
 
