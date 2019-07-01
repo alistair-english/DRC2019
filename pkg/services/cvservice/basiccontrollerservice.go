@@ -3,7 +3,6 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -64,10 +63,10 @@ func (c *BasicControllerService) Start() {
 			gocv.CvtColor(sourceImg, &hsvImg, gocv.ColorBGRToHSV)
 			// fmt.Println(time.Since(start))
 
-			start := time.Now()
+			// start := time.Now()
 			// Find the HSV objects in the image
 			result := cvhelpers.FindHSVObjects(hsvImg, objects)
-			fmt.Println("Calc: ", time.Since(start))
+			// fmt.Println("Calc: ", time.Since(start))
 
 			// for _, group := range result {
 			// 	if len(group.Objects) > 0 {
