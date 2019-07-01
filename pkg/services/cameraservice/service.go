@@ -6,6 +6,8 @@ import (
 	"github.com/alistair-english/DRC2019/pkg/arch"
 )
 
+const TAG = "cameraservice"
+
 // CameraService provides a camera connection
 type CameraService struct {
 	imageRequests        chan GetImageActionReq
