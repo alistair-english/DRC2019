@@ -49,7 +49,7 @@ func (c *BasicControllerService) Start() {
 
 		t := time.Now()
 
-		counter := 0
+		// counter := 0
 
 		controller := newBasicDriveController()
 
@@ -88,18 +88,18 @@ func (c *BasicControllerService) Start() {
 			fmt.Println(control)
 			fmt.Println()
 
-			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
-			counter++
-			if time.Since(t) > time.Second {
-				fmt.Println(counter)
-				counter = 0
-				t = time.Now()
-			}
-			// if time.Since(t) > time.Millisecond*100 {
-
+			// c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
+			// counter++
+			// if time.Since(t) > time.Second {
+			// 	fmt.Println(counter)
+			// 	counter = 0
 			// 	t = time.Now()
-			// 	fmt.Println("sent.")
 			// }
+			if time.Since(t) > time.Millisecond*100 {
+				c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
+				t = time.Now()
+				fmt.Println("sent.")
+			}
 			// fmt.Println(time.Since(start))
 		}
 	}()
