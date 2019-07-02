@@ -3,6 +3,7 @@ package serialservice
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/tarm/serial"
 )
@@ -47,12 +48,12 @@ type PiSerial struct {
 func (s PiSerial) RunSerialTx(writeChan <-chan []byte) error {
 	// Iterate over the channel looking for new stuff to shoot out over serial
 	for v := range writeChan {
+		t := time.Now()
 		_, err := s.connection.Write(v)
 		if err != nil {
 			return err
 		}
-		// Debug Delay yeet delet this when actually doing stuff
-		//t.Sleep(1000 * t.Millisecond)
+		fmt.Println(time.Since(t))
 	}
 	return nil
 }
