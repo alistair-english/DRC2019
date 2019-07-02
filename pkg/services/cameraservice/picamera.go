@@ -72,7 +72,7 @@ func getPiCameraCmd() *exec.Cmd {
 
 	cmd.Args = append(cmd.Args, args...)
 
-	logging.L().Logln(TAG, logging.All, "raspivid args: %v", cmd)
+	logging.L().Logln(TAG, logging.All, "raspivid args: %v", cmd.Args)
 
 	return cmd
 
