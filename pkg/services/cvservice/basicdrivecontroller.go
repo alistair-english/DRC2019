@@ -40,6 +40,7 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 	var (
 		leftLineGroup  cvhelpers.HSVObjectGroupResult
 		rightLineGroup cvhelpers.HSVObjectGroupResult
+		obstaclesGroup cvhelpers.HSVObjectGroupResult
 	)
 
 	for _, obj := range objs {
@@ -48,19 +49,21 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 			leftLineGroup = obj
 		case RIGHT_LINE:
 			rightLineGroup = obj
+		// case OBSTACLE:
+		// 	obstaclesGroup = obj
 		default:
 			logging.L().Logln(TAG, logging.All, "Unknown obj detected: %v", obj)
 		}
 	}
 
-	ang, _ := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
+	ang, _ := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup)
 	return serialservice.Control{
 		Dir: ang,
 		Spd: 100,
 	}
 }
 
-func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup cvhelpers.HSVObjectGroupResult) (int8, int8) {
+func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup cvhelpers.HSVObjectGroupResult) (int8, int8) {
 	var leftLine cvhelpers.HSVObject
 	var rightLine cvhelpers.HSVObject
 
@@ -82,8 +85,17 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	fmt.Println("Left X:", leftLine.BoundingBox.Max.X, "Y: ", leftLine.BoundingBox.Min.Y)
 	fmt.Println("Right X:", rightLine.BoundingBox.Min.X, "Y: ", rightLine.BoundingBox.Min.Y)
 
-	horDiff := rightLine.BoundingBox.Min.X - leftLine.BoundingBox.Max.X
-	horX := leftLine.BoundingBox.Max.X + horDiff/2
+	var (
+		leftBound  = leftLine.BoundingBox.Max.X
+		rightBound = rightLine.BoundingBox.Min.X
+	)
+
+	// for _, obj := range obstaclesGroup.Objects {
+	// 	leftDist := obj.BoundingBox.Min.X -
+	// }
+
+	horDiff := rightBound - leftBound
+	horX := leftBound + horDiff/2
 
 	cartX := horX - (c.width / 2)
 	cartY := gohelpers.IntMax(c.height-leftLine.BoundingBox.Min.Y, c.height-rightLine.BoundingBox.Min.Y)

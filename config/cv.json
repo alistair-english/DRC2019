@@ -38,6 +38,24 @@
                 "V": 255,
                 "path": "/some/path"
             }
+        },
+
+        {
+            "name": "OBSTACLE",
+            "numToFind": 1,
+            "minArea": 1000,
+            "lowerMask": {
+                "H": 20,
+                "S": 40,
+                "V": 100,
+                "path": "/some/path"
+            },
+            "upperMask": {
+                "H": 40,
+                "S": 255,
+                "V": 255,
+                "path": "/some/path"
+            }
         }
     ]
 }
