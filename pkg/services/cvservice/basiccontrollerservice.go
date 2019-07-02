@@ -98,7 +98,7 @@ func (c *BasicControllerService) Start() {
 			if time.Since(t) > time.Millisecond*100 {
 				c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 				t = time.Now()
-				fmt.Println("sent.")
+				// fmt.Println("sent.")
 			}
 			// fmt.Println(time.Since(start))
 		}
