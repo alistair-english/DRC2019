@@ -101,7 +101,6 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		} else {
 			rightBound = obj.BoundingBox.Min.X
 		}
-
 	}
 
 	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound)
