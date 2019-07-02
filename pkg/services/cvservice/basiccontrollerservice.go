@@ -93,7 +93,7 @@ func (c *BasicControllerService) Start() {
 			if time.Since(t) > time.Second {
 				fmt.Println(counter)
 				counter = 0
-				t = time.Now
+				t = time.Now()
 			}
 			// if time.Since(t) > time.Millisecond*100 {
 
