@@ -47,7 +47,6 @@ type PiSerial struct {
 func (s PiSerial) RunSerialTx(writeChan <-chan []byte) error {
 	// Iterate over the channel looking for new stuff to shoot out over serial
 	for v := range writeChan {
-		fmt.Println(v)
 		_, err := s.connection.Write(v)
 		if err != nil {
 			return err
