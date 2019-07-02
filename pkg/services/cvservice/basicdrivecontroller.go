@@ -49,8 +49,8 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 			leftLineGroup = obj
 		case RIGHT_LINE:
 			rightLineGroup = obj
-		// case OBSTACLE:
-		// 	obstaclesGroup = obj
+		case OBSTACLE:
+			obstaclesGroup = obj
 		default:
 			logging.L().Logln(TAG, logging.All, "Unknown obj detected: %v", obj)
 		}
@@ -90,9 +90,20 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		rightBound = rightLine.BoundingBox.Min.X
 	)
 
-	// for _, obj := range obstaclesGroup.Objects {
-	// 	leftDist := obj.BoundingBox.Min.X -
-	// }
+	// Update left and right bounds based on obstacles
+	for _, obj := range obstaclesGroup.Objects {
+		fmt.Println("Obstacle:", obj.BoundingBox.Min.X, "-", obj.BoundingBox.Max.X)
+		leftDist := obj.BoundingBox.Min.X - leftBound
+		rightDist := rightBound - obj.BoundingBox.Max.X
+
+		if leftDist < rightDist {
+			leftBound = obj.BoundingBox.Max.X
+		} else {
+			rightBound = obj.BoundingBox.Min.X
+		}
+	}
+
+	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound)
 
 	horDiff := rightBound - leftBound
 	horX := leftBound + horDiff/2
