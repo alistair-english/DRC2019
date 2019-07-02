@@ -53,10 +53,10 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 		}
 	}
 
-	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
+	ang, _ := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
 	return serialservice.Control{
 		Dir: ang,
-		Spd: spd,
+		Spd: 100,
 	}
 }
 
