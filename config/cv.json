@@ -10,8 +10,8 @@
             "minArea": 1000,
             "lowerMask": {
                 "H": 90,
-                "S": 60,
-                "V": 70,
+                "S": 30,
+                "V": 40,
                 "path": "/some/path"
             },
             "upperMask": {
@@ -29,7 +29,7 @@
             "lowerMask": {
                 "H": 10,
                 "S": 50,
-                "V": 120,
+                "V": 100,
                 "path": "/some/path"
             },
             "upperMask": {
