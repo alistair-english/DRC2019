@@ -26,7 +26,7 @@ func newBasicDriveController() *basicDriveController {
 
 	controlConfig := config.GetControlPIDConfig()
 	controller.controlPID = pidctrl.NewPIDController(controlConfig.Pid.P, controlConfig.Pid.I, controlConfig.Pid.D)
-	controller.controlPID.SetOutputLimits(-50.0, 50.0)
+	controller.controlPID.SetOutputLimits(-90.0, 90.0)
 	controller.controlPID.Set(0.00)
 
 	cvConfig := config.GetCVConfig()
