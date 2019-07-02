@@ -69,14 +69,14 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		leftLine.BoundingBox = leftLineGroup.Objects[0].BoundingBox
 	} else {
 		// no line found -> create a line out to the left
-		leftLine.BoundingBox = image.Rect(0, c.height, 0, c.height)
+		leftLine.BoundingBox = image.Rect(0, c.height/2, 0, c.height/2)
 	}
 
 	if len(rightLineGroup.Objects) > 0 {
 		rightLine.BoundingBox = rightLineGroup.Objects[0].BoundingBox
 	} else {
 		// no line found -> create a line out to the right
-		rightLine.BoundingBox = image.Rect(c.width, c.height, c.width, c.height)
+		rightLine.BoundingBox = image.Rect(c.width, c.height/2, c.width, c.height/2)
 	}
 
 	fmt.Println("Left X:", leftLine.BoundingBox.Max.X)
@@ -86,9 +86,9 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	horX := leftLine.BoundingBox.Max.X + horDiff/2
 
 	cartX := horX - (c.width / 2)
-	cartY := c.height
+	cartY := gohelpers.IntMin(c.height-leftLine.BoundingBox.Min.Y, c.height-rightLine.BoundingBox.Min.Y)
 
-	cartAngle := gohelpers.RadToDeg(math.Atan2(10, float64(cartX)))
+	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
 	driveSpeed := int8((cartY / c.height) * 100)
