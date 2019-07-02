@@ -3,6 +3,7 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -50,7 +51,7 @@ func (c *BasicControllerService) Start() {
 
 		for { // inifinte loop
 
-			// start := time.Now()
+			start := time.Now()
 			// get the image
 			getImgBlocking(c.actionRequestChannel, &sourceImg)
 			// fmt.Println("Img: ", time.Since(start))
@@ -79,12 +80,12 @@ func (c *BasicControllerService) Start() {
 
 			// start := time.Now()
 			control := controller.update(result)
-			// fmt.Println(time.Since(start))
 
 			fmt.Println(control)
 			fmt.Println()
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
+			fmt.Println(time.Since(start))
 		}
 	}()
 }
