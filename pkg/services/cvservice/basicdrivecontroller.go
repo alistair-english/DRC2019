@@ -79,8 +79,8 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		rightLine.BoundingBox = image.Rect(c.width, c.height/2, c.width, c.height/2)
 	}
 
-	fmt.Println("Left X:", leftLine.BoundingBox.Max.X)
-	fmt.Println("Right X:", rightLine.BoundingBox.Min.X)
+	fmt.Println("Left X:", leftLine.BoundingBox.Max.X, "Y: ", leftLine.BoundingBox.Min.Y)
+	fmt.Println("Right X:", rightLine.BoundingBox.Min.X, "Y: ", rightLine.BoundingBox.Min.Y)
 
 	horDiff := rightLine.BoundingBox.Min.X - leftLine.BoundingBox.Max.X
 	horX := leftLine.BoundingBox.Max.X + horDiff/2
