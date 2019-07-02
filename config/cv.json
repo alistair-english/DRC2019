@@ -43,7 +43,7 @@
         {
             "name": "OBSTACLE",
             "numToFind": 2,
-            "minArea": 1000,
+            "minArea": 3000,
             "lowerMask": {
                 "H": 115,
                 "S": 50,

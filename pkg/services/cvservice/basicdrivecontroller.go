@@ -49,8 +49,8 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 			leftLineGroup = obj
 		case RIGHT_LINE:
 			rightLineGroup = obj
-		// case OBSTACLE:
-		// 	obstaclesGroup = obj
+		case OBSTACLE:
+			obstaclesGroup = obj
 		default:
 			logging.L().Logln(TAG, logging.All, "Unknown obj detected: %v", obj)
 		}
