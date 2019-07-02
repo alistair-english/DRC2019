@@ -49,6 +49,8 @@ func (c *BasicControllerService) Start() {
 
 		t := time.Now()
 
+		counter := 0
+
 		controller := newBasicDriveController()
 
 		for { // inifinte loop
@@ -87,6 +89,12 @@ func (c *BasicControllerService) Start() {
 			fmt.Println()
 
 			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
+			counter++
+			if time.Since(t) > time.Second {
+				fmt.Println(counter)
+				counter = 0
+				t = time.Now()
+			}
 			// if time.Since(t) > time.Millisecond*100 {
 
 			// 	t = time.Now()
