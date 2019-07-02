@@ -3,7 +3,6 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -49,8 +48,6 @@ func (c *BasicControllerService) Start() {
 
 		controller := newBasicDriveController()
 
-		t := time.Now()
-
 		for { // inifinte loop
 
 			// start := time.Now()
@@ -86,12 +83,7 @@ func (c *BasicControllerService) Start() {
 			fmt.Println(control)
 			fmt.Println()
 
-			if time.Since(t) >= time.Millisecond*60 {
-				// only send data every 60 ms
-				c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
-				t = time.Now()
-			}
-
+			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 			// fmt.Println(time.Since(start))
 		}
 	}()
