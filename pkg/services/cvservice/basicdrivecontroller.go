@@ -87,11 +87,13 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 
 	cartX := horX - (c.width / 2)
 	cartY := gohelpers.IntMax(c.height-leftLine.BoundingBox.Min.Y, c.height-rightLine.BoundingBox.Min.Y)
+	fmt.Println(cartY)
 
 	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
 	driveSpeed := int8((cartY / c.height) * 100)
+	fmt.Println(cartY / c.height)
 
 	return trackAngle, driveSpeed
 }
