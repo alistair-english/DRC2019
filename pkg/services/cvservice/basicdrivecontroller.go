@@ -94,7 +94,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	for _, obj := range obstaclesGroup.Objects {
 		fmt.Println("Obstacle:", obj.BoundingBox.Min.X, "-", obj.BoundingBox.Max.X)
 		leftDist := obj.BoundingBox.Min.X - leftBound
-		rightDist := obj.BoundingBox.Max.X - rightBound
+		rightDist := rightBound - obj.BoundingBox.Max.X
 
 		if leftDist < rightDist {
 			leftBound = obj.BoundingBox.Max.X
