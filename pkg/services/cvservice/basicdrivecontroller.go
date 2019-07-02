@@ -53,10 +53,10 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 		}
 	}
 
-	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
+	ang, _ := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup)
 	return serialservice.Control{
 		Dir: ang,
-		Spd: spd,
+		Spd: 100,
 	}
 }
 
@@ -69,30 +69,29 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		leftLine.BoundingBox = leftLineGroup.Objects[0].BoundingBox
 	} else {
 		// no line found -> create a line out to the left
-		leftLine.BoundingBox = image.Rect(0, c.height, 0, c.height)
+		leftLine.BoundingBox = image.Rect(0, c.height/2, 0, c.height/2)
 	}
 
 	if len(rightLineGroup.Objects) > 0 {
 		rightLine.BoundingBox = rightLineGroup.Objects[0].BoundingBox
 	} else {
 		// no line found -> create a line out to the right
-		rightLine.BoundingBox = image.Rect(c.width, c.height, c.width, c.height)
+		rightLine.BoundingBox = image.Rect(c.width, c.height/2, c.width, c.height/2)
 	}
 
-	fmt.Println("Left X:", leftLine.BoundingBox.Max.X)
-	fmt.Println("Right X:", rightLine.BoundingBox.Min.X)
-	fmt.Println()
+	fmt.Println("Left X:", leftLine.BoundingBox.Max.X, "Y: ", leftLine.BoundingBox.Min.Y)
+	fmt.Println("Right X:", rightLine.BoundingBox.Min.X, "Y: ", rightLine.BoundingBox.Min.Y)
 
 	horDiff := rightLine.BoundingBox.Min.X - leftLine.BoundingBox.Max.X
 	horX := leftLine.BoundingBox.Max.X + horDiff/2
 
 	cartX := horX - (c.width / 2)
-	cartY := c.height
+	cartY := gohelpers.IntMax(c.height-leftLine.BoundingBox.Min.Y, c.height-rightLine.BoundingBox.Min.Y)
 
-	cartAngle := gohelpers.RadToDeg(math.Atan2(10, float64(cartX)))
+	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
-	driveSpeed := int8((cartY / c.height) * 100)
+	driveSpeed := int8((float64(cartY) / float64(c.height)) * 100)
 
 	return trackAngle, driveSpeed
 }

@@ -42,3 +42,11 @@ func IntMin(a, b int) int {
 	}
 	return b
 }
+
+// IntMax finds the minimum of two integers
+func IntMax(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}

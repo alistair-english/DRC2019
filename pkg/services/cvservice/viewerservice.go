@@ -44,9 +44,9 @@ func (v *ViewerService) Start() {
 		for range timingChannel {
 			go func() {
 				window.IMShow(camImg)
-				window.WaitKey(1)
+				window.WaitKey(0)
+				v.actionRequestChannel <- cameraservice.GetImageActionReq{&camImg, timingChannel}
 			}()
-			v.actionRequestChannel <- cameraservice.GetImageActionReq{&camImg, timingChannel}
 		}
 	}()
 }

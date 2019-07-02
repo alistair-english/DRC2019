@@ -31,7 +31,7 @@ func main() {
 	log.Logln("", logging.All, "Done.")
 
 	log.Log(TAG, logging.All, "Getting camera... ")
-	camService, err := cameraservice.NewFileReaderCamera("../recorder/recording_06-30-2019_21:42:55.avi")
+	camService, err := cameraservice.NewFileReaderCamera("../recorder/m5-sport.avi")
 	if err != nil {
 		log.Logln("", logging.All, err.Error())
 		return

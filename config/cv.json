@@ -1,6 +1,6 @@
 {
-    "imgWidth": 1920,
-    "imgHeight": 1080,
+    "imgWidth": 960,
+    "imgHeight": 540,
     "imgChannels": 3,
 
     "objects": [
@@ -9,9 +9,9 @@
             "numToFind": 1,
             "minArea": 1000,
             "lowerMask": {
-                "H": 100,
-                "S": 90,
-                "V": 80,
+                "H": 90,
+                "S": 60,
+                "V": 60,
                 "path": "/some/path"
             },
             "upperMask": {
@@ -27,9 +27,9 @@
             "numToFind": 1,
             "minArea": 1000,
             "lowerMask": {
-                "H": 10,
-                "S": 70,
-                "V": 90,
+                "H": 20,
+                "S": 40,
+                "V": 100,
                 "path": "/some/path"
             },
             "upperMask": {

@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/alistair-english/DRC2019/pkg/config"
+	"github.com/alistair-english/DRC2019/pkg/logging"
 	"gocv.io/x/gocv"
 )
 
@@ -70,6 +71,9 @@ func getPiCameraCmd() *exec.Cmd {
 	}
 
 	cmd.Args = append(cmd.Args, args...)
+
+	logging.L().Logln(TAG, logging.All, "raspivid args: %v", cmd.Args)
+
 	return cmd
 
 }

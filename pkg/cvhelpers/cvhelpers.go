@@ -62,7 +62,8 @@ type Contour struct {
 // Will return less contours than num if it finds less.
 func FindLargestContours(in gocv.Mat, num int, minArea float64) []Contour {
 
-	result := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
+	result := gocv.FindContours(in, gocv.RetrievalExternal, gocv.ChainApproxSimple)
+	// result := gocv.FindContours(in, gocv.RetrievalTree, gocv.ChainApproxNone)
 
 	// Cut out any contours under min area
 	var contours []Contour
@@ -156,7 +157,7 @@ func findHSVObjectGroup(img gocv.Mat, objectGroup HSVObjectGroup, resultChan cha
 	mask := gocv.NewMatWithSize(img.Rows(), img.Cols(), gocv.MatTypeCV8U)
 	defer mask.Close()
 
-	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 2, 2, &mask)
+	InRangeBySegments(img, objectGroup.Masks.Lower, objectGroup.Masks.Upper, 4, 4, &mask)
 
 	// TODO: morphological transformations on the mask to make it better
 
