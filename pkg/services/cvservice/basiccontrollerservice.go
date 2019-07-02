@@ -3,7 +3,6 @@ package cvservice
 import (
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/alistair-english/DRC2019/pkg/arch"
 	"github.com/alistair-english/DRC2019/pkg/cvhelpers"
@@ -47,7 +46,7 @@ func (c *BasicControllerService) Start() {
 		// displayWindow := gocv.NewWindow("Display")
 		// defer displayWindow.Close()
 
-		t := time.Now()
+		// t := time.Now()
 
 		// counter := 0
 
@@ -88,18 +87,18 @@ func (c *BasicControllerService) Start() {
 			fmt.Println(control)
 			fmt.Println()
 
-			// c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
+			c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
 			// counter++
 			// if time.Since(t) > time.Second {
 			// 	fmt.Println(counter)
 			// 	counter = 0
 			// 	t = time.Now()
 			// }
-			if time.Since(t) > time.Millisecond*100 {
-				c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
-				t = time.Now()
-				// fmt.Println("sent.")
-			}
+			// if time.Since(t) > time.Millisecond*100 {
+			// 	c.actionRequestChannel <- serialservice.SerialSendActionReq{control}
+			// 	t = time.Now()
+			// 	// fmt.Println("sent.")
+			// }
 			// fmt.Println(time.Since(start))
 		}
 	}()
