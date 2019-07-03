@@ -60,13 +60,13 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 		}
 	}
 
-	ang, _ := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup)
+	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup)
 
 	dir := -int8(c.controlPID.Update(float64(ang)))
 
 	return serialservice.Control{
 		Dir: dir,
-		Spd: 100,
+		Spd: spd,
 	}
 }
 
@@ -127,6 +127,8 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
 	driveSpeed := int8((float64(cartY) / float64(c.height)) * 100)
+
+	fmt.Println(driveSpeed)
 
 	return trackAngle, driveSpeed
 }
