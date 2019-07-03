@@ -68,6 +68,7 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 
 	if len(stopLineGroup.Objects) > 0 && stopLineGroup.Objects[0].BoundingBox.Max.Y > c.generalConf.StopLineMaxY {
 		spd = -1
+		fmt.Println("Sending STOP!")
 	}
 
 	return serialservice.Control{
