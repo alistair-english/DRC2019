@@ -91,6 +91,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	var (
 		leftBound  = leftLine.BoundingBox.Max.X
 		rightBound = rightLine.BoundingBox.Min.X
+		vertBound  = gohelpers.IntMax(leftLine.BoundingBox.Min.Y, rightLine.BoundingBox.Min.Y)
 	)
 
 	// Update left and right bounds based on obstacles
@@ -104,6 +105,8 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		} else {
 			rightBound = obj.BoundingBox.Min.X
 		}
+
+		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
 	}
 
 	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound)
@@ -112,7 +115,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	horX := leftBound + horDiff/2
 
 	cartX := horX - (c.width / 2)
-	cartY := gohelpers.IntMax(c.height-leftLine.BoundingBox.Min.Y, c.height-rightLine.BoundingBox.Min.Y)
+	cartY := c.height - vertBound
 
 	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
