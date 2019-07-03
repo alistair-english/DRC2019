@@ -19,6 +19,7 @@ type basicDriveController struct {
 	controlPID *pidctrl.PIDController
 	width      int
 	height     int
+	obstXExc   int
 }
 
 func newBasicDriveController() *basicDriveController {
@@ -32,6 +33,9 @@ func newBasicDriveController() *basicDriveController {
 	cvConfig := config.GetCVConfig()
 	controller.width = cvConfig.ImgWidth
 	controller.height = cvConfig.ImgHeight
+
+	obstConf := config.GetObstacleXExclusion()
+	controller.obstXExc = obstConf.ObstacleXExclusion
 
 	return &controller
 }
@@ -56,10 +60,13 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 		}
 	}
 
-	ang, _ := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup)
+	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup)
+
+	dir := -int8(c.controlPID.Update(float64(ang)))
+
 	return serialservice.Control{
-		Dir: ang,
-		Spd: 100,
+		Dir: dir,
+		Spd: spd,
 	}
 }
 
@@ -88,33 +95,40 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	var (
 		leftBound  = leftLine.BoundingBox.Max.X
 		rightBound = rightLine.BoundingBox.Min.X
+		vertBound  = gohelpers.IntMax(leftLine.BoundingBox.Min.Y, rightLine.BoundingBox.Min.Y)
 	)
+
+	fmt.Println(c.obstXExc)
 
 	// Update left and right bounds based on obstacles
 	for _, obj := range obstaclesGroup.Objects {
-		fmt.Println("Obstacle:", obj.BoundingBox.Min.X, "-", obj.BoundingBox.Max.X)
+		fmt.Println("Obstacle:", obj.BoundingBox.Min.X, "-", obj.BoundingBox.Max.X, "Base:", obj.BoundingBox.Max.Y)
 		leftDist := obj.BoundingBox.Min.X - leftBound
 		rightDist := rightBound - obj.BoundingBox.Max.X
 
 		if leftDist < rightDist {
-			leftBound = obj.BoundingBox.Max.X
+			leftBound = gohelpers.IntMax(obj.BoundingBox.Max.X+c.obstXExc, 0)
 		} else {
-			rightBound = obj.BoundingBox.Min.X
+			rightBound = gohelpers.IntMin(obj.BoundingBox.Min.X-c.obstXExc, c.width)
 		}
+
+		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
 	}
 
-	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound)
+	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound, "Vert Bound:", vertBound)
 
 	horDiff := rightBound - leftBound
 	horX := leftBound + horDiff/2
 
 	cartX := horX - (c.width / 2)
-	cartY := gohelpers.IntMax(c.height-leftLine.BoundingBox.Min.Y, c.height-rightLine.BoundingBox.Min.Y)
+	cartY := c.height - vertBound
 
 	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
-	driveSpeed := int8((float64(cartY) / float64(c.height)) * 100)
+	driveSpeed := int8(math.Pow(float64(cartY)/float64(c.height), 2) * 100)
+
+	fmt.Println(driveSpeed)
 
 	return trackAngle, driveSpeed
 }

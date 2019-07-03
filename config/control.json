@@ -1,19 +1,8 @@
 {
     "controlPid":{
-        "P": 1,
+        "P": 1.4,
         "I": 0,
-        "D": 0
+        "D": 0.1
     },
-
-    "boundaryPid":{
-        "P": 0,
-        "I": 0,
-        "D": 0
-    },
-
-    "opponentPid":{
-        "P": 0,
-        "I": 0,
-        "D": 0
-    }
+    "obstacleXExclusion": 100
 }
