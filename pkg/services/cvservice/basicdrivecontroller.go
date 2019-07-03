@@ -98,6 +98,8 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		vertBound  = gohelpers.IntMax(leftLine.BoundingBox.Min.Y, rightLine.BoundingBox.Min.Y)
 	)
 
+	fmt.Println(c.obstXExc)
+
 	// Update left and right bounds based on obstacles
 	for _, obj := range obstaclesGroup.Objects {
 		fmt.Println("Obstacle:", obj.BoundingBox.Min.X, "-", obj.BoundingBox.Max.X, "Base:", obj.BoundingBox.Max.Y)
