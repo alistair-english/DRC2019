@@ -16,10 +16,11 @@ import (
 )
 
 type basicDriveController struct {
-	controlPID *pidctrl.PIDController
-	width      int
-	height     int
-	obstXExc   int
+	controlPID    *pidctrl.PIDController
+	width         int
+	height        int
+	obstXExc      int
+	speedPowerNum float64
 }
 
 func newBasicDriveController() *basicDriveController {
@@ -34,8 +35,9 @@ func newBasicDriveController() *basicDriveController {
 	controller.width = cvConfig.ImgWidth
 	controller.height = cvConfig.ImgHeight
 
-	obstConf := config.GetObstacleXExclusion()
+	obstConf := config.GetGeneralControlConfig()
 	controller.obstXExc = obstConf.ObstacleXExclusion
+	controller.speedPowerNum = obstConf.SpeedPowerNum
 
 	return &controller
 }
@@ -126,7 +128,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
-	driveSpeed := int8(math.Pow(float64(cartY)/float64(c.height), 2) * 100)
+	driveSpeed := int8(math.Pow(float64(cartY)/float64(c.height), c.speedPowerNum) * 100)
 
 	fmt.Println(driveSpeed)
 

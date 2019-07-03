@@ -27,8 +27,10 @@ type OpponentPID struct {
 	Pid PID `json:"opponentPid"`
 }
 
-type ObstacleXExclusion struct {
-	ObstacleXExclusion int `json:"obstacleXExclusion"`
+// GeneralControlConfig is misc general control stuff
+type GeneralControlConfig struct {
+	ObstacleXExclusion int     `json:"obstacleXExclusion"`
+	SpeedPowerNum      float64 `json:"speedPowerNum"`
 }
 
 // GetControlPIDConfig returns a control pid struct populated from the config file
@@ -70,14 +72,15 @@ func GetOpponentPIDConfig() OpponentPID {
 	return oppPid
 }
 
-func GetObstacleXExclusion() ObstacleXExclusion {
-	var obstExc ObstacleXExclusion
+// GetGeneralControlConfig gets the general control config
+func GetGeneralControlConfig() GeneralControlConfig {
+	var genConf GeneralControlConfig
 	controlConfigFile, err := os.Open(os.Getenv("GOPATH") + CONTROL_CONF_FILE)
 	defer controlConfigFile.Close()
 	if err != nil {
 		panic(err)
 	}
 	jsonParser := json.NewDecoder(controlConfigFile)
-	jsonParser.Decode(&obstExc)
-	return obstExc
+	jsonParser.Decode(&genConf)
+	return genConf
 }
