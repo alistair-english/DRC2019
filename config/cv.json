@@ -28,7 +28,7 @@
             "minArea": 1000,
             "lowerMask": {
                 "H": 22,
-                "S": 50,
+                "S": 40,
                 "V": 100,
                 "path": "/some/path"
             },
