@@ -66,6 +66,10 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 
 	dir := -int8(c.controlPID.Update(float64(ang)))
 
+	if spd < 1 {
+		spd = 5
+	}
+
 	if len(stopLineGroup.Objects) > 0 && stopLineGroup.Objects[0].BoundingBox.Max.Y > c.generalConf.StopLineMaxY {
 		spd = -1
 		fmt.Println("Sending STOP!")
@@ -119,7 +123,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 			rightBound = gohelpers.IntMin(obj.BoundingBox.Min.X-c.generalConf.ObstacleXExclusion, c.width)
 		}
 
-		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
+		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y-50)
 	}
 
 	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound, "Vert Bound:", vertBound)

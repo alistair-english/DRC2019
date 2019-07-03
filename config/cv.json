@@ -10,7 +10,7 @@
             "minArea": 1000,
             "lowerMask": {
                 "H": 90,
-                "S": 40,
+                "S": 30,
                 "V": 60,
                 "path": "/some/path"
             },
@@ -28,7 +28,7 @@
             "minArea": 1000,
             "lowerMask": {
                 "H": 22,
-                "S": 40,
+                "S": 50,
                 "V": 100,
                 "path": "/some/path"
             },
@@ -43,7 +43,7 @@
         {
             "name": "OBSTACLE",
             "numToFind": 2,
-            "minArea": 3000,
+            "minArea": 4000,
             "lowerMask": {
                 "H": 130,
                 "S": 30,
@@ -61,7 +61,7 @@
         {
             "name": "STOP_LINE",
             "numToFind": 1,
-            "minArea": 1000,
+            "minArea": 1500,
             "lowerMask": {
                 "H": 50,
                 "S": 30,
