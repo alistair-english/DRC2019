@@ -109,7 +109,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
 	}
 
-	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound)
+	fmt.Println("Left Bound:", leftBound, "Right Bound:", rightBound, "Vert Bound:", vertBound)
 
 	horDiff := rightBound - leftBound
 	horX := leftBound + horDiff/2
