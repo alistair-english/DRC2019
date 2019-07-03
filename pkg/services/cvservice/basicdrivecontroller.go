@@ -16,11 +16,11 @@ import (
 )
 
 type basicDriveController struct {
-	controlPID    *pidctrl.PIDController
-	width         int
-	height        int
-	obstXExc      int
-	speedPowerNum float64
+	controlPID   *pidctrl.PIDController
+	generalConf  *config.GeneralControlConfig
+	seenStopLine bool
+	width        int
+	height       int
 }
 
 func newBasicDriveController() *basicDriveController {
@@ -35,9 +35,9 @@ func newBasicDriveController() *basicDriveController {
 	controller.width = cvConfig.ImgWidth
 	controller.height = cvConfig.ImgHeight
 
-	obstConf := config.GetGeneralControlConfig()
-	controller.obstXExc = obstConf.ObstacleXExclusion
-	controller.speedPowerNum = obstConf.SpeedPowerNum
+	controller.generalConf = config.GetGeneralControlConfig()
+
+	controller.seenStopLine = false
 
 	return &controller
 }
@@ -47,6 +47,7 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 		leftLineGroup  cvhelpers.HSVObjectGroupResult
 		rightLineGroup cvhelpers.HSVObjectGroupResult
 		obstaclesGroup cvhelpers.HSVObjectGroupResult
+		stopLineGroup  cvhelpers.HSVObjectGroupResult
 	)
 
 	for _, obj := range objs {
@@ -57,6 +58,8 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 			rightLineGroup = obj
 		case OBSTACLE:
 			obstaclesGroup = obj
+		case STOP_LINE:
+			stopLineGroup = obj
 		default:
 			logging.L().Logln(TAG, logging.All, "Unknown obj detected: %v", obj)
 		}
@@ -65,6 +68,14 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 	ang, spd := c.getTrackAngleAndDriveSpeed(leftLineGroup, rightLineGroup, obstaclesGroup)
 
 	dir := -int8(c.controlPID.Update(float64(ang)))
+
+	if !c.seenStopLine && len(stopLineGroup.Objects) > 0 && stopLineGroup.Objects[0].BoundingBox.Max.Y > c.generalConf.StopLineMaxY {
+		c.seenStopLine = true
+	}
+
+	if c.seenStopLine {
+		spd = 0
+	}
 
 	return serialservice.Control{
 		Dir: dir,
@@ -100,7 +111,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		vertBound  = gohelpers.IntMax(leftLine.BoundingBox.Min.Y, rightLine.BoundingBox.Min.Y)
 	)
 
-	fmt.Println(c.obstXExc)
+	fmt.Println(c.generalConf.ObstacleXExclusion)
 
 	// Update left and right bounds based on obstacles
 	for _, obj := range obstaclesGroup.Objects {
@@ -109,9 +120,9 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		rightDist := rightBound - obj.BoundingBox.Max.X
 
 		if leftDist < rightDist {
-			leftBound = gohelpers.IntMax(obj.BoundingBox.Max.X+c.obstXExc, 0)
+			leftBound = gohelpers.IntMax(obj.BoundingBox.Max.X+c.generalConf.ObstacleXExclusion, 0)
 		} else {
-			rightBound = gohelpers.IntMin(obj.BoundingBox.Min.X-c.obstXExc, c.width)
+			rightBound = gohelpers.IntMin(obj.BoundingBox.Min.X-c.generalConf.ObstacleXExclusion, c.width)
 		}
 
 		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
@@ -128,7 +139,7 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 	cartAngle := gohelpers.RadToDeg(math.Atan2(float64(cartY), float64(cartX)))
 
 	trackAngle := CartesianToDriveAngle(cartAngle)
-	driveSpeed := int8(math.Pow(float64(cartY)/float64(c.height), c.speedPowerNum) * 100)
+	driveSpeed := int8(math.Pow(float64(cartY)/float64(c.height), c.generalConf.SpeedPowerNum) * 100)
 
 	fmt.Println(driveSpeed)
 
