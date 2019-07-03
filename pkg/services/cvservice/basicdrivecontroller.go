@@ -19,6 +19,7 @@ type basicDriveController struct {
 	controlPID *pidctrl.PIDController
 	width      int
 	height     int
+	obstXExc   int
 }
 
 func newBasicDriveController() *basicDriveController {
@@ -32,6 +33,9 @@ func newBasicDriveController() *basicDriveController {
 	cvConfig := config.GetCVConfig()
 	controller.width = cvConfig.ImgWidth
 	controller.height = cvConfig.ImgHeight
+
+	obstConf := config.GetObstacleXExclusion()
+	controller.obstXExc = obstConf.ObstacleXExclusion
 
 	return &controller
 }
@@ -101,9 +105,9 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		rightDist := rightBound - obj.BoundingBox.Max.X
 
 		if leftDist < rightDist {
-			leftBound = obj.BoundingBox.Max.X
+			leftBound = gohelpers.IntMax(obj.BoundingBox.Min.X-c.obstXExc, 0)
 		} else {
-			rightBound = obj.BoundingBox.Min.X
+			rightBound = gohelpers.IntMax(obj.BoundingBox.Max.X+c.obstXExc, c.width)
 		}
 
 		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
