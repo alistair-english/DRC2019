@@ -107,9 +107,9 @@ func (c *basicDriveController) getTrackAngleAndDriveSpeed(leftLineGroup, rightLi
 		rightDist := rightBound - obj.BoundingBox.Max.X
 
 		if leftDist < rightDist {
-			leftBound = gohelpers.IntMax(obj.BoundingBox.Min.X-c.obstXExc, 0)
+			leftBound = gohelpers.IntMax(obj.BoundingBox.Max.X+c.obstXExc, 0)
 		} else {
-			rightBound = gohelpers.IntMin(obj.BoundingBox.Max.X+c.obstXExc, c.width)
+			rightBound = gohelpers.IntMin(obj.BoundingBox.Min.X-c.obstXExc, c.width)
 		}
 
 		vertBound = gohelpers.IntMax(vertBound, obj.BoundingBox.Max.Y)
