@@ -16,11 +16,10 @@ import (
 )
 
 type basicDriveController struct {
-	controlPID   *pidctrl.PIDController
-	generalConf  *config.GeneralControlConfig
-	seenStopLine bool
-	width        int
-	height       int
+	controlPID  *pidctrl.PIDController
+	generalConf *config.GeneralControlConfig
+	width       int
+	height      int
 }
 
 func newBasicDriveController() *basicDriveController {
@@ -36,8 +35,6 @@ func newBasicDriveController() *basicDriveController {
 	controller.height = cvConfig.ImgHeight
 
 	controller.generalConf = config.GetGeneralControlConfig()
-
-	controller.seenStopLine = false
 
 	return &controller
 }
@@ -69,12 +66,8 @@ func (c *basicDriveController) update(objs []cvhelpers.HSVObjectGroupResult) ser
 
 	dir := -int8(c.controlPID.Update(float64(ang)))
 
-	if !c.seenStopLine && len(stopLineGroup.Objects) > 0 && stopLineGroup.Objects[0].BoundingBox.Max.Y > c.generalConf.StopLineMaxY {
-		c.seenStopLine = true
-	}
-
-	if c.seenStopLine {
-		spd = 0
+	if len(stopLineGroup.Objects) > 0 && stopLineGroup.Objects[0].BoundingBox.Max.Y > c.generalConf.StopLineMaxY {
+		spd = -1
 	}
 
 	return serialservice.Control{
