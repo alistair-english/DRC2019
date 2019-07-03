@@ -1,8 +1,8 @@
 {
     "controlPid":{
-        "P": 1,
+        "P": 1.4,
         "I": 0,
-        "D": 0
+        "D": 0.1
     },
     "obstacleXExclusion": 100
 }
