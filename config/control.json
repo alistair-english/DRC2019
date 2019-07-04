@@ -6,5 +6,6 @@
     },
     "obstacleXExclusion": 200,
     "speedPowerNum": 4,
+    "speedPowerAdd": 0.2,
     "stopLineMaxY": 400
 }

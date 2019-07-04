@@ -31,6 +31,7 @@ type OpponentPID struct {
 type GeneralControlConfig struct {
 	ObstacleXExclusion int     `json:"obstacleXExclusion"`
 	SpeedPowerNum      float64 `json:"speedPowerNum"`
+	SpeedPowerAdd      float64 `json:"speedPowerAdd"`
 	StopLineMaxY       int     `json:"stopLineMaxY"`
 }
 
