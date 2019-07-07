@@ -33,4 +33,4 @@ The ESP32 program was written in C. C was chosen because the ESPIDF with FreeRTO
 ### Results
 Our team (wact<sup>2</sup>) managed to place 1st overall in the challenge, crossing the line ahead of our opponent in the final run while not incurring any penalties for breaches of the rules.
 
-[Here](https://www.linkedin.com/feed/update/urn:li:ugcPost:6552799282754355201) is a video of the final run. Our robot is on the right at the start line
+[Here](https://www.linkedin.com/feed/update/urn:li:ugcPost:6552441568345882624) is a video of the final run. Our robot is on the right at the start line
