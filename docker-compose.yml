@@ -1,0 +1,8 @@
+drc:
+  image: drc2019:latest
+  volumes:
+    - /home/alistair/.Xauthority:/root/.Xauthority
+    - .:/go/src/github.com/alistair-english/DRC2019
+  environment:
+    DISPLAY: $DISPLAY
+  net: "host"
