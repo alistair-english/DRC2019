@@ -1,9 +1,11 @@
 {
     "controlPid":{
-        "P": 1.4,
+        "P": 1.2,
         "I": 0,
         "D": 0.1
     },
-    "obstacleXExclusion": 100,
-    "SpeedPowerNum": 2
+    "obstacleXExclusion": 200,
+    "speedPowerNum": 4,
+    "speedPowerAdd": 0.2,
+    "stopLineMaxY": 400
 }
